@@ -1,0 +1,24 @@
+project(VM)
+cmake_minimum_required(VERSION 3.14)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(INSTRACTIONS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Instractions)
+set(FRAME_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Frame)
+set(INTERPRETATOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Interpretator)
+set(MAIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/main)
+
+set(VM_SRC
+${MAIN_DIR}/main.cpp
+${INSTRACTIONS_DIR}/instractions.cpp
+)
+
+set(VM_LIB_DIRS
+${INSTRACTIONS_DIR}
+${FRAME_DIR}
+${INSTRACTIONS_DIR}
+)
+
+add_executable(vm ${VM_SRC})
+target_include_directories(vm PRIVATE ${VM_LIB_DIRS})
