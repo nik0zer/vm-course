@@ -29,12 +29,15 @@ When method calls first (K) registers [0:K-1] threated as parameters, when metho
 
 ### mv.\<type\> \<reg\>, \<val\>   
 reg = val
+opcode: 0
 
 ### stacc.\<type\> \<reg\>
 acc = reg
+opcode: 1
 
 ### ldacc.\<type\> \<reg\>
 reg = acc
+opcode: 2
 
 </details>
 
@@ -43,15 +46,19 @@ reg = acc
 
 ### add.\<type\> \<regout\>, \<regin_1\>, \<regin_2\>   
 regout = regin_1 + regin_2
+opcode: 3
 
 ### sub.\<type\> \<regout\>, \<regin_1\>, \<regin_2\>   
 regout = regin_1 - regin_2
+opcode: 4
 
 ### mul.\<type\> \<regout\>, \<regin_1\>, \<regin_2\>   
 regout = regin_1 * regin_2
+opcode: 5
 
 ### div.\<type\> \<regout\>, \<regin_1\>, \<regin_2\>   
 regout = regin_1 / regin_2
+opcode: 6
 
 </details>
 
@@ -60,12 +67,15 @@ regout = regin_1 / regin_2
 
 ### cmpeq.\<type\> \<regin_1\>, \<regin_2\>  
 acc = regin_1 == regin_2
+opcode: 7
 
 ### cmpgt.\<type\> \<regin_1\>, \<regin_2\>  
 acc = regin_1 > regin_2
+opcode: 8
 
 ### cmpge.\<type\> \<regin_1\>, \<regin_2\>  
 acc = regin_1 >= regin_2
+opcode: 9
 
 </details>
 
@@ -74,14 +84,18 @@ acc = regin_1 >= regin_2
 
 ### jmp \<mark\>   
 pc = address(mark)
+opcode: 10
 
 ### cjmpt \<mark\>   
 if(acc)
     pc = address(mark)
+opcode: 11
 
 ### cjmpf \<mark\>   
 if(!acc)
     pc = address(mark)
+
+opcode: 12
 
 </details>
 
@@ -90,8 +104,10 @@ if(!acc)
 
 ### call \<function\>   
 function()
+opcode: 13
 
 ### ret
 return
+opcode: 14
 
 </details>
