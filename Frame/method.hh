@@ -20,8 +20,8 @@ using OpcodeType = uint8_t;
 enum class OpcodeTable : OpcodeType 
 {
   MV = 0,
-  STACK = 1,
-  LDACK = 2,
+  STACC = 1,
+  LDACC = 2,
   ADD = 3,
   SUB = 4,
   MUL = 5,
@@ -38,10 +38,10 @@ enum class OpcodeTable : OpcodeType
 
 struct Instr
 {
-    Frame::OpcodeTable opcode;
-    Frame::RegType rd, rs1, rs2;
-    Frame::ImmType immedeate;
-    Frame::MarkType mark;
+  Frame::OpcodeTable opcode;
+  Frame::RegType rd, rs1, rs2;
+  Frame::ImmType immedeate;
+  Frame::MarkType mark;
 };
 
 class Method
@@ -52,9 +52,9 @@ class Method
     RegType allRegisters_;
     std::vector<RegValue> regFile_;
     RegValue PC {0};
-    std::unordered_map<std::string, RegValue> marks;
 
   public:
+    std::unordered_map<std::string, RegValue> marks;
     std::vector<Instr> instructionSet_;
     Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters), 
     localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), 
@@ -68,8 +68,7 @@ class Method
     void setReg(const RegType &reg, const RegValue &val);
     const RegValue &getPC();
     void setPC(const RegValue &pc);
-
-
+    void createMark(const Frame::MarkType mark);
 };
 
 }

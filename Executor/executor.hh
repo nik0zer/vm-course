@@ -15,11 +15,6 @@ class Executor {
     std::unordered_map<std::string, std::shared_ptr<Frame::Method>> cleanMethodList_;
     
     void handleCall(const std::string& callMethod);
-#ifdef DISPATCH_TABLE
-    bool handleRet();
-#else
-    void handleRet();
-#endif
 
   public:
     Executor () 

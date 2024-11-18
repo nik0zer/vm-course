@@ -43,4 +43,9 @@ const RegValue &Method::getPC()
 {
     return PC;
 }
+
+void Method::createMark(const Frame::MarkType mark) 
+{
+    marks.emplace(mark, instructionSet_.size());
+}
 }
