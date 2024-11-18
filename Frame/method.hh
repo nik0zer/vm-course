@@ -1,22 +1,48 @@
 #pragma once
-
-#include "instruction.hh"
-#include "executor.hh"
-
 #include <memory>
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <variant>
 
-namespace Instruction
-{
-  class Instr;
-}
+class Executor;
+class Emitter;
+
 namespace Frame
 {
+
 using RegValue = int64_t;
 using RegType = uint64_t;
+using ImmType = RegValue;
+using MarkType = std::string;
+using OpcodeType = uint8_t;
+
+enum class OpcodeTable : OpcodeType 
+{
+  MV = 0,
+  STACK = 1,
+  LDACK = 2,
+  ADD = 3,
+  SUB = 4,
+  MUL = 5,
+  DIV = 6,
+  CMPEQ = 7,
+  CMPGT = 8,
+  CMPGE = 9,
+  JMP = 10,
+  CJMPT = 11,
+  CJMPF = 13,
+  CALL = 14,
+  RET = 15,
+};
+
+struct Instr
+{
+    Frame::OpcodeTable opcode;
+    Frame::RegType rd, rs1, rs2;
+    Frame::ImmType immedeate;
+    Frame::MarkType mark;
+};
 
 class Method
 {
@@ -29,19 +55,21 @@ class Method
     std::unordered_map<std::string, RegValue> marks;
 
   public:
-    std::vector<Instruction::Instr> instructionSet_;
+    std::vector<Instr> instructionSet_;
     Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters), 
     localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), 
     regFile_(allRegisters_), marks() {}
 
     std::shared_ptr<Method> getCleanCopy() const;
 
-    void addInstruction(std::string opcode, Frame::RegType rd, Frame::RegType rs1, Frame::RegType rs2, Frame::Imm immedeate);
+    void addInstruction(Instr instr);
 
     const RegValue &getReg(const RegType &reg);
     void setReg(const RegType &reg, const RegValue &val);
-    const RegValue &getAccumulator (Executor& exec);
-    void setAccumulator(Executor& exec, const RegValue &val);
+    const RegValue &getPC();
+    void setPC(const RegValue &pc);
+
+
 };
 
 }

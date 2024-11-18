@@ -1,18 +1,37 @@
 #include "executor.hh"
-#include "instruction.hh"
 #include "method.hh"
+#include <stdexcept>
 
-void Executor::handleInstruction(Instruction::Instr& instr, Frame::Method& frame)
-{
-    
-}
+#define SET_REG(reg, val) \
+method->setReg(reg, val);
 
 void Executor::handleCall(const std::string& callMethod) 
 {
+    if(cleanMethodList_.find(callMethod) == cleanMethodList_.end())
+    {
+        throw std::runtime_error("NO SUCH METHOD");
+    }
     callStack_.push_back(cleanMethodList_[callMethod]->getCleanCopy());
 }
 
-const Frame::RegValue& Executor::getAccumulator() 
+void Executor::simpleInterpreter(const std::string &EntryPoint)
 {
-    return accumulator_;
+#ifdef DISPATCH_TABLE
+
+#else
+    handleCall(EntryPoint);
+    while(!callStack_.empty())
+    {
+        auto method = callStack_.back();
+        auto instr = method->instructionSet_[method->getPC()];
+        switch(instr.opcode)
+        {
+            case Frame::OpcodeTable::MV:
+            {
+                SET_REG(instr.rd, instr.immedeate)
+                break;
+            }
+        }
+    }
+#endif
 }
