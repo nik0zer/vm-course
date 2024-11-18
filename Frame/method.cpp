@@ -1,5 +1,4 @@
-#include "method.h"
-// #include "instruction.h"
+#include "method.hh"
 
 #include <stdexcept>
 
@@ -24,17 +23,24 @@ void Method::setReg(const RegType &reg, const RegValue &val)
     regFile_[reg] = val;
 }
 
-const RegValue &Method::getAccumulator() 
+const RegValue &Method::getAccumulator (Executor& exec) 
 {
-
+    return exec.getAccumulator();
 }
 
-void Method::setAccumulator(const RegValue &val) 
+void Method::setAccumulator(Executor& exec, const RegValue &val) 
 {
-
+    exec.setAccumulator(val);
 }
 
-void Method::addInstruction(std::string opcode, Frame::RegType rd, Frame::RegType rs1, Frame::RegType rs2, Frame::Imm immedeate) {
-    instructionSet_.push_back({opcode, rd, rs1, rs2, immedeate}); 
+void Method::addInstruction(std::string opcode, Frame::RegType rd, Frame::RegType rs1, Frame::RegType rs2, Frame::Imm immedeate) 
+{
+    Instruction::Instr instr{opcode, rd, rs1, rs2, immedeate}; 
+    instructionSet_.push_back(instr); 
+}
+
+std::shared_ptr<Method> Method::getCleanCopy() const 
+{
+    return std::make_shared<Method>(*this);
 }
 }
