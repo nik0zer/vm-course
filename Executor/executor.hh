@@ -17,7 +17,7 @@ class Executor {
     void handleCall(const std::string& callMethod);
 
   public:
-    Executor () 
+    Executor(std::unordered_map<std::string, std::shared_ptr<Frame::Method>> methods) : cleanMethodList_(methods) 
     {
       accumulator_ = 0;
     };

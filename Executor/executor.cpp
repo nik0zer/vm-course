@@ -1,21 +1,25 @@
 #include "executor.hh"
 #include "method.hh"
 #include <stdexcept>
+#include <iostream>
 
 #define SET_REG(reg, val)                                                   \
-method->setReg(reg, val);
+method->setReg(reg, val)
+
+#define GET_REG(reg)                                                        \
+method->getReg(reg)
 
 #define ARITHMETICAL(operator, name)                                        \
 case name:                                                                  \
 {                                                                           \
-    SET_REG(instr.rd, instr.rs1 operator instr.rs2)                         \
+    SET_REG(instr.rd, GET_REG(instr.rs1) operator GET_REG(instr.rs2));      \
     break;                                                                  \
 }
 
 #define COMPARE(operator, name)                                             \
 case name:                                                                  \
 {                                                                           \
-    SET_REG(accumulator_, instr.rs1 operator instr.rs2)                     \
+    accumulator_ = GET_REG(instr.rs1) operator GET_REG(instr.rs2) ;         \
     break;                                                                  \
 }
 
@@ -23,9 +27,9 @@ case name:                                                                  \
 case name:                                                                  \
 {                                                                           \
     if(conditional) {                                                       \
-        method->setPC(method->marks[mark]);                                 \
-        break;                                                              \
+        method->setPC(method->marks[mark] - 1);                             \
     }                                                                       \
+    break;                                                                  \
 }
 
 void Executor::handleCall(const std::string& callMethod) 
@@ -51,19 +55,19 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
         {
             case Frame::OpcodeTable::MV:
             {
-                SET_REG(instr.rd, instr.immedeate)
+                SET_REG(instr.rd, instr.immedeate);
                 break;
             }
 
             case Frame::OpcodeTable::STACC:
             {
-                SET_REG(accumulator_, instr.rs1)
+                accumulator_ = GET_REG(instr.rs1);
                 break;
             }
 
             case Frame::OpcodeTable::LDACC:
             {
-                SET_REG(instr.rd, accumulator_)
+                SET_REG(instr.rd, accumulator_);
                 break;
             }
 
@@ -77,8 +81,8 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
             COMPARE(>=, Frame::OpcodeTable::CMPGE)
             
             JUMP(true, Frame::OpcodeTable::JMP, instr.mark)
-            JUMP(accumulator_, Frame::OpcodeTable::CJMPT, instr.mark)
-            JUMP(!accumulator_, Frame::OpcodeTable::CJMPF, instr.mark)
+            JUMP(accumulator_ == 1, Frame::OpcodeTable::CJMPT, instr.mark)
+            JUMP(accumulator_ != 1, Frame::OpcodeTable::CJMPF, instr.mark)
 
             case Frame::OpcodeTable::CALL:
             {
@@ -89,8 +93,15 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
             case Frame::OpcodeTable::RET:
             {
                 callStack_.pop_back();
+                break;
+            }
+            case Frame::OpcodeTable::PRINT:
+            {
+                std::cout << instr.mark << GET_REG(instr.rs1) << std::endl;
+                break;
             }
         }
+        method->setPC(method->getPC() + 1);
     }
 #endif
 }

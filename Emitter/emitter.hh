@@ -65,12 +65,17 @@ class Emitter {
 
     void createRet(Frame::Method& method)
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::RET, 0, 0, 0, 0, 0)
+      CREATE_INSTR(method, Frame::OpcodeTable::RET, 0, 0, 0, 0, "")
     }   
 
     void createMark(Frame::Method& method, Frame::MarkType mark)
     {
       method.createMark(mark);
+    }
+
+    void createPrint(Frame::Method& method, Frame::MarkType description, Frame::RegType reg)
+    {
+      CREATE_INSTR(method, Frame::OpcodeTable::PRINT, 0, reg, 0, 0, description);
     }
 
 };

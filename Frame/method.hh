@@ -5,9 +5,6 @@
 #include <string>
 #include <variant>
 
-class Executor;
-class Emitter;
-
 namespace Frame
 {
 
@@ -34,6 +31,7 @@ enum class OpcodeTable : OpcodeType
   CJMPF = 13,
   CALL = 14,
   RET = 15,
+  PRINT = 16,
 };
 
 struct Instr
