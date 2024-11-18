@@ -1,8 +1,8 @@
-// #include "method.hh"
-// #include "executor.hh"
+#include "emitter.hh"
 
 void BootProgram() {
-    // Executor 
+    Emitter emit;
+    
 };
 
 int main()

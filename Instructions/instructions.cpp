@@ -1,2 +1,4 @@
-#include "instruction.h"
+#include "instruction.hh"
+#include "method.hh"
+
 

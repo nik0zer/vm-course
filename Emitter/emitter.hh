@@ -1,11 +1,24 @@
 #pragma once
-#include "instruction.h"
-#include "method.h"
+
+namespace Frame {
+  class Method;
+};// namespace Frame
+
+namespace Instruction {
+  class Instr;
+}; // namespace Instruction
 
 
 class Emitter {
+  private:
+    void emit(Frame::Method& method, Instruction::Instr& inst);
+
   public:
-    void emit(Frame::Method& method, Instruction::Instr& inst) {
-      method.addInstruction(inst);
-    };
+    Emitter() {};
+    // createMvInstr();
+    // int createArithmeticalInstr();
+    // createCompareInstr();
+    // createJumpInstr();
+    // createCallInstr();
+
 };
