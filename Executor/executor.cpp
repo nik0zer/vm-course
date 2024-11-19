@@ -12,6 +12,8 @@ method->setReg(reg, val)
 #define GET_REG(reg)                                                        \
 method->getReg(reg)
 
+#ifndef COMPUTED_GOTO
+
 #define ARITHMETICAL(operator, name)                                        \
 case name:                                                                  \
 {                                                                           \
@@ -35,22 +37,51 @@ case name:                                                                  \
     break;                                                                  \
 }
 
+#else
+
+#define RUN_NEXT_INST(method)                                               \
+    method->setPC(method->getPC() + 1);                                     \
+    instr = method->getInstrPC();                                           \
+    goto *gotoLabels[static_cast<int>(instr.opcode)];                       \
+
+#define ARITHMETICAL(label, method, operator)                               \
+  label:                                                                    \
+    SET_REG(instr.rd, GET_REG(instr.rs1) operator GET_REG(instr.rs2));      \
+    RUN_NEXT_INST(method)                                                   \
+
+#define COMPARE(label, method, operator)                                    \
+  label:                                                                    \
+    accumulator_ = GET_REG(instr.rs1) operator GET_REG(instr.rs2) ;         \
+    RUN_NEXT_INST(method)                                                   \
+
+#define JUMP(label, method, conditional, mark)                              \
+  label:                                                                    \
+    if(conditional) {                                                       \
+        method->setPC(method->getMark(mark) - 1);                           \
+    }                                                                       \
+    RUN_NEXT_INST(method)                                                   \
+
+#endif
+
 void Executor::handleCall(const std::string& callMethod)
 {
     if(cleanMethodList_.find(callMethod) == cleanMethodList_.end())
     {
         throw std::runtime_error("NO SUCH METHOD");
     }
-    callStack_.push_back(std::make_shared<Frame::Frame>(cleanMethodList_[callMethod]));
+    auto newFrame = std::make_shared<Frame::Frame>(cleanMethodList_[callMethod]);
+    if(!callStack_.empty())
+    {
+        newFrame->copyParams(*(callStack_.back()));
+    }
+    callStack_.push_back(newFrame);
 }
 
 void Executor::simpleInterpreter(const std::string &EntryPoint)
 {
-#ifdef DISPATCH_TABLE
-
-#else
-    uint64_t numOfOperations = 0;
     handleCall(EntryPoint);
+#ifndef COMPUTED_GOTO
+    uint64_t numOfOperations = 0;
     while(!callStack_.empty())
     {
         auto method = callStack_.back();
@@ -109,5 +140,64 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
         method->setPC(method->getPC() + 1);
     }
     std::cout << "[EXECUTED NUMBER OF OPERATIONS]: " << numOfOperations << std::endl;
+
+#else
+    const void* gotoLabels[] = {&&MV, &&STACC, &&LDACC, &&ADD, &&SUB, &&MUL, &&DIV, &&CMPEQ, 
+    &&CMPGT, &&CMPGE, &&JMP, &&CJMPT, &&CJMPF, &&CALL, &&RET, &&PRINT};
+    std::shared_ptr<Frame::Frame> method = callStack_.back();
+    Frame::Instr instr = method->getInstrPC();
+  GETMETHOD:
+    method = callStack_.back();
+    instr = method->getInstrPC();
+    goto *gotoLabels[static_cast<int>(instr.opcode)];
+
+  MV:
+    SET_REG(instr.rd, instr.immedeate);
+    RUN_NEXT_INST(method)
+    
+  STACC:
+    accumulator_ = GET_REG(instr.rs1);
+    RUN_NEXT_INST(method)
+
+  LDACC:
+    SET_REG(instr.rd, accumulator_);
+    RUN_NEXT_INST(method)
+
+    ARITHMETICAL(ADD, method, +)
+    ARITHMETICAL(SUB, method, -)
+    ARITHMETICAL(MUL, method, *)
+    ARITHMETICAL(DIV, method, /)
+
+    COMPARE(CMPEQ, method, ==)
+    COMPARE(CMPGT, method, >)
+    COMPARE(CMPGE, method, >=)
+
+    JUMP(JMP, method, true, instr.mark)
+    JUMP(CJMPT, method, accumulator_ == 1, instr.mark)
+    JUMP(CJMPF, method, accumulator_ != 1, instr.mark)
+
+  CALL:
+    handleCall(instr.mark);
+    goto GETMETHOD;
+
+
+  RET:
+    callStack_.pop_back();
+    if(!callStack_.empty())
+    {
+        goto GETMETHOD;
+    }
+    goto END;
+    
+
+  PRINT:
+    std::cout << instr.mark << GET_REG(instr.rs1) << std::endl;
+    RUN_NEXT_INST(method)
+
+  END:
+    return;
+
 #endif
+
+
 }

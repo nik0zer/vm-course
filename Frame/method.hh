@@ -29,10 +29,10 @@ enum class OpcodeTable : OpcodeType
   CMPGE = 9,
   JMP = 10,
   CJMPT = 11,
-  CJMPF = 13,
-  CALL = 14,
-  RET = 15,
-  PRINT = 16,
+  CJMPF = 12,
+  CALL = 13,
+  RET = 14,
+  PRINT = 15,
 };
 
 struct Instr

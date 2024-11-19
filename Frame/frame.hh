@@ -2,6 +2,7 @@
 #include "method.hh"
 #include <memory>
 #include <stdexcept>
+#include <algorithm>
 
 namespace Frame
 {
@@ -12,8 +13,6 @@ class Frame
     std::shared_ptr<Method> method;
     std::vector<RegValue> regFile_;
     RegValue PC {0};
-
-
 
   public:
     Frame(std::shared_ptr<Method> method) : method(method), regFile_(method->allRegisters()) {}
@@ -55,6 +54,11 @@ class Frame
     inline const RegValue &getMark(const std::string &mark)
     {
         return method->getMark(mark);
+    }
+
+    inline void copyParams(const Frame &otherFrame)
+    {
+        std::copy_n(otherFrame.regFile_.begin(), method->paramsSize(), regFile_.begin());
     }
 
 
