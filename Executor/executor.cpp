@@ -1,5 +1,8 @@
 #include "executor.hh"
-#include "method.hh"
+#include "frame.hh"
+#include <cstdint>
+#include <memory>
+#include <ostream>
 #include <stdexcept>
 #include <iostream>
 
@@ -27,18 +30,18 @@ case name:                                                                  \
 case name:                                                                  \
 {                                                                           \
     if(conditional) {                                                       \
-        method->setPC(method->marks[mark] - 1);                             \
+        method->setPC(method->getMark(mark) - 1);                           \
     }                                                                       \
     break;                                                                  \
 }
 
-void Executor::handleCall(const std::string& callMethod) 
+void Executor::handleCall(const std::string& callMethod)
 {
     if(cleanMethodList_.find(callMethod) == cleanMethodList_.end())
     {
         throw std::runtime_error("NO SUCH METHOD");
     }
-    callStack_.push_back(cleanMethodList_[callMethod]->getCleanCopy());
+    callStack_.push_back(std::make_shared<Frame::Frame>(cleanMethodList_[callMethod]));
 }
 
 void Executor::simpleInterpreter(const std::string &EntryPoint)
@@ -46,11 +49,12 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
 #ifdef DISPATCH_TABLE
 
 #else
+    uint64_t numOfOperations = 0;
     handleCall(EntryPoint);
     while(!callStack_.empty())
     {
         auto method = callStack_.back();
-        auto instr = method->instructionSet_[method->getPC()];
+        auto instr = method->getInstrPC();
         switch(instr.opcode)
         {
             case Frame::OpcodeTable::MV:
@@ -79,7 +83,7 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
             COMPARE(==, Frame::OpcodeTable::CMPEQ)
             COMPARE(>, Frame::OpcodeTable::CMPGT)
             COMPARE(>=, Frame::OpcodeTable::CMPGE)
-            
+
             JUMP(true, Frame::OpcodeTable::JMP, instr.mark)
             JUMP(accumulator_ == 1, Frame::OpcodeTable::CJMPT, instr.mark)
             JUMP(accumulator_ != 1, Frame::OpcodeTable::CJMPF, instr.mark)
@@ -101,7 +105,9 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
                 break;
             }
         }
+        numOfOperations++;
         method->setPC(method->getPC() + 1);
     }
+    std::cout << "[EXECUTED NUMBER OF OPERATIONS]: " << numOfOperations << std::endl;
 #endif
 }

@@ -3,7 +3,6 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <variant>
 
 namespace Frame
 {
@@ -14,7 +13,9 @@ using ImmType = RegValue;
 using MarkType = std::string;
 using OpcodeType = uint8_t;
 
-enum class OpcodeTable : OpcodeType 
+class Frame;
+
+enum class OpcodeTable : OpcodeType
 {
   MV = 0,
   STACC = 1,
@@ -36,37 +37,34 @@ enum class OpcodeTable : OpcodeType
 
 struct Instr
 {
-  Frame::OpcodeTable opcode;
-  Frame::RegType rd, rs1, rs2;
-  Frame::ImmType immedeate;
-  Frame::MarkType mark;
+  OpcodeTable opcode;
+  RegType rd, rs1, rs2;
+  ImmType immedeate;
+  MarkType mark;
 };
 
 class Method
 {
-  private:
     RegType paramsSize_;
     RegType localRegisters_;
     RegType allRegisters_;
-    std::vector<RegValue> regFile_;
-    RegValue PC {0};
-
-  public:
     std::unordered_map<std::string, RegValue> marks;
     std::vector<Instr> instructionSet_;
-    Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters), 
-    localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), 
-    regFile_(allRegisters_), marks() {}
+  public:
+    Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters),
+    localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), marks() {}
 
     std::shared_ptr<Method> getCleanCopy() const;
 
     void addInstruction(Instr instr);
 
-    const RegValue &getReg(const RegType &reg);
-    void setReg(const RegType &reg, const RegValue &val);
-    const RegValue &getPC();
-    void setPC(const RegValue &pc);
-    void createMark(const Frame::MarkType mark);
+    inline const RegType &paramsSize() {return paramsSize_;}
+    inline const RegType &localRegisters() {return localRegisters_;}
+    inline const RegType &allRegisters() {return allRegisters_;}
+    inline const Instr &getInstr(const RegValue &pc) {return instructionSet_[pc];}
+    inline const RegValue &getMark(const std::string mark) {return marks[mark];}
+
+    void createMark(const MarkType mark);
 };
 
 }

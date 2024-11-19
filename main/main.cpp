@@ -9,9 +9,9 @@ void BootProgram() {
     emit.createMv(*pMain, 1, 1);
     emit.createMv(*pMain, 2, 1);
     emit.createMark(*pMain, "Cicle");
-    emit.createSub(*pMain, 0, 0, 1);
     emit.createPrint(*pMain, "reg 0: ", 0);
     emit.createMul(*pMain, 2, 2, 0);
+    emit.createSub(*pMain, 0, 0, 1);
     emit.createCmpgt(*pMain, 0, 1);
     emit.createCjmpt(*pMain, "Cicle");
     emit.createPrint(*pMain, "factorial: ", 2);
@@ -20,7 +20,7 @@ void BootProgram() {
     methods["main"] = pMain;
     Executor exec(methods);
     exec.simpleInterpreter("main");
-    
+
 };
 
 int main()
