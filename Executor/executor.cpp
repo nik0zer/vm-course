@@ -39,8 +39,11 @@ case name:                                                                  \
 
 #else
 
+#define PC_NEXT(method)                                                     \
+    method->setPC(method->getPC() + 1);
+
 #define RUN_NEXT_INST(method)                                               \
-    method->setPC(method->getPC() + 1);                                     \
+    PC_NEXT(method)                                                         \
     instr = method->getInstrPC();                                           \
     goto *gotoLabels[static_cast<int>(instr.opcode)];                       \
 
@@ -177,6 +180,7 @@ void Executor::simpleInterpreter(const std::string &EntryPoint)
     JUMP(CJMPF, method, accumulator_ != 1, instr.mark)
 
   CALL:
+    PC_NEXT(method)
     handleCall(instr.mark);
     goto GETMETHOD;
 

@@ -31,8 +31,7 @@ void FibsRecursion(uint64_t n)
     Emitter emit;
 
     std::shared_ptr<Frame::Method> Fibs(new Frame::Method(1, 5));
-
-    emit.createPrint(*Fibs, "par: ", 0);
+    
     emit.createMv(*Fibs, 5, 2);
     emit.createCmpgt(*Fibs, 0, 5);
     emit.createCjmpt(*Fibs, "recursion");

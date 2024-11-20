@@ -6,7 +6,7 @@
 #include "frame.hh"
 #include <unordered_map>
 
-// #define COMPUTED_GOTO
+#define COMPUTED_GOTO
 
 class Executor {
   private:
