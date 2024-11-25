@@ -1,6 +1,6 @@
 #include "emitter.hh"
 #include "method.hh"
 
-void Emitter::emit(Frame::Method& method, Frame::Instr inst) {
+void Emitter::emit(Method::Method& method, Method::Instr inst) {
     method.addInstruction(inst);
 }

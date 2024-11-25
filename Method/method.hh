@@ -4,16 +4,14 @@
 #include <unordered_map>
 #include <string>
 
-namespace Frame
+namespace Method
 {
 
 using RegValue = int64_t;
-using RegType = uint64_t;
+using RegType = uint16_t;
 using ImmType = RegValue;
 using MarkType = std::string;
 using OpcodeType = uint8_t;
-
-class Frame;
 
 enum class OpcodeTable : OpcodeType
 {
@@ -53,8 +51,6 @@ class Method
   public:
     Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters),
     localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), marks() {}
-
-    std::shared_ptr<Method> getCleanCopy() const;
 
     void addInstruction(Instr instr);
 
