@@ -1,18 +1,62 @@
-// #include "executor.hh"
-// #include "frame.hh"
-// #include <cstdint>
-// #include <memory>
-// #include <ostream>
-// #include <stdexcept>
-// #include <iostream>
+#include "executor.hh"
+#include "method.hh"
 
-// #define SET_REG(reg, val)                                                   \
-// method->setReg(reg, val)
+constexpr uint8_t IMM_1_REG_1_SIZE = sizeof(Method::OpcodeType) + sizeof(Method::ImmType)
++ sizeof(Method::RegType);
+constexpr uint8_t REG_1_SIZE = sizeof(Method::OpcodeType) + sizeof(Method::RegType);
+constexpr uint8_t IMM_1_REG_1_SIZE = sizeof(Method::OpcodeType) + sizeof(Method::ImmType)
++ sizeof(Method::RegType);
+constexpr uint8_t IMM_1_REG_1_SIZE = sizeof(Method::OpcodeType) + sizeof(Method::ImmType);
+constexpr uint8_t REG_3_SIZE = sizeof(Method::OpcodeType) + sizeof(Method::RegType) * 3U;
 
-// #define GET_REG(reg)                                                        \
-// method->getReg(reg)
 
-// #ifndef COMPUTED_GOTO
+#define ALL_INSTR_LIST  \
+    _(0, MV, IMM_1_REG_1_SIZE)          \
+    _(1, STACC, REG_1_SIZE)       \
+    _(2, LDACC, REG_1_SIZE)       \
+    _()
+
+#define DISPATCH_INSTR(opcode, name, frame) \
+    case opcode: name(frame); break;
+
+#define GENERATE_DISPATCH_SWITCH(frame) \
+    switch (opcode) {                  \
+        ALL_INSTR_LIST(DISPATCH_INSTR)   \
+        default:                         \
+            std::cerr << "Unknown opcode" << std::endl; \
+            break;                     \
+    }
+
+
+#define SET_REG(reg, val)                                                   \
+    method->setReg(reg, val) 
+
+#define GET_REG(reg)                                                        \
+    method->getReg(reg) 
+
+#define MV(name)                                                            \
+inline void name (Method::RegType rd, Method::RegType imm) {                \
+    SET_REG(rd, imm);                                                       \
+}
+
+#define ARITHMETICAL(operator, name)                                        \
+inline void name (RegType rd, RegType rs1, RegType rs2) {                   \
+    SET_REG(rd, GET_REG(rs1) operator GET_REG(rs2));                        \
+}
+
+#define COMPARE(operator, name)                                             \
+inline void name (RegType rs1, RegType rs2) {                               \
+    accumulator_ = GET_REG(rs1) operator GET_REG(rs2) ;                     \
+}
+    
+#define JUMP(conditional, name, offset)                                     \
+inline void name (RegType offset) {                                         \
+    if(conditional) {                                                       \
+        method->setPC(method->getMark(offset) - 1);                         \
+    }                                                                       \
+}                                          
+
+MV(handleMV)
 
 // #define ARITHMETICAL(operator, name)                                        \
 // case name:                                                                  \
@@ -66,79 +110,24 @@
 
 // #endif
 
-// void Executor::handleCall(const std::string& callMethod)
-// {
-//     if(cleanMethodList_.find(callMethod) == cleanMethodList_.end())
-//     {
-//         throw std::runtime_error("NO SUCH METHOD");
-//     }
-//     auto newFrame = std::make_shared<Frame::Frame>(cleanMethodList_[callMethod]);
-//     if(!callStack_.empty())
-//     {
-//         newFrame->copyParams(*(callStack_.back()));
-//     }
-//     callStack_.push_back(newFrame);
-// }
+void Executor::handleCall(int callMethod)
+{
 
-// void Executor::simpleInterpreter(const std::string &EntryPoint)
-// {
-//     handleCall(EntryPoint);
-// #ifndef COMPUTED_GOTO
-//     uint64_t numOfOperations = 0;
-//     while(!callStack_.empty())
-//     {
-//         auto method = callStack_.back();
-//         auto instr = method->getInstrPC();
-//         switch(instr.opcode)
-//         {
-//             case Method::OpcodeTable::MV:
-//             {
-//                 SET_REG(instr.rd, instr.immedeate);
-//                 break;
-//             }
+}
 
-//             case Method::OpcodeTable::STACC:
-//             {
-//                 accumulator_ = GET_REG(instr.rs1);
-//                 break;
-//             }
-
-//             case Method::OpcodeTable::LDACC:
-//             {
-//                 SET_REG(instr.rd, accumulator_);
-//                 break;
-//             }
-
-//             ARITHMETICAL(+, Method::OpcodeTable::ADD)
-//             ARITHMETICAL(-, Method::OpcodeTable::SUB)
-//             ARITHMETICAL(*, Method::OpcodeTable::MUL)
-//             ARITHMETICAL(/, Method::OpcodeTable::DIV)
-
-//             COMPARE(==, Method::OpcodeTable::CMPEQ)
-//             COMPARE(>, Method::OpcodeTable::CMPGT)
-//             COMPARE(>=, Method::OpcodeTable::CMPGE)
-
-//             JUMP(true, Method::OpcodeTable::JMP, instr.mark)
-//             JUMP(accumulator_ == 1, Method::OpcodeTable::CJMPT, instr.mark)
-//             JUMP(accumulator_ != 1, Method::OpcodeTable::CJMPF, instr.mark)
-
-//             case Method::OpcodeTable::CALL:
-//             {
-//                 handleCall(instr.mark);
-//                 break;
-//             }
-
-//             case Method::OpcodeTable::RET:
-//             {
-//                 callStack_.pop_back();
-//                 break;
-//             }
-//             case Method::OpcodeTable::PRINT:
-//             {
-//                 std::cout << instr.mark << GET_REG(instr.rs1) << std::endl;
-//                 break;
-//             }
-//         }
+void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
+{
+    handleCall();
+#ifndef COMPUTED_GOTO
+    uint64_t numOfOperations = 0;
+    while(true)
+    {
+        auto frame = stackPtr_;
+        auto instr = frame->getInstrPC();
+        GENERATE_DISPATCH_SWITCH(frame)
+    }
+#endif
+}
 //         numOfOperations++;
 //         method->setPC(method->getPC() + 1);
 //     }

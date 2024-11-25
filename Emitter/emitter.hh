@@ -5,19 +5,19 @@
 emit(method, Method::Instr {opcode, rd, rs1, rs2, imm, mark});
 
 #define CREATE_ARITHMETIC_INSTR(opcode, name)                                                               \
-void create##name(Method::Method& method, Method::RegType rd, Method::RegType rs1, Method::RegType rs2)         \
+void create##name(Method::Method& method, Method::RegType rd, Method::RegType rs1, Method::RegType rs2)     \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, rd, rs1, rs2, 0, "")                                                         \
 }
 
 #define CREATE_COMPARE_INSTR(opcode, name)                                                                  \
-void create##name(Method::Method& method, Method::RegType rs1, Method::RegType rs2)                            \
+void create##name(Method::Method& method, Method::RegType rs1, Method::RegType rs2)                         \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, 0, rs1, rs2, 0, "")                                                          \
 }                                                                                                           
 
 #define CREATE_JMP_INSTR(opcode, name)                                                                      \
-void create##name(Method::Method& method, Method::MarkType mark)                                              \
+void create##name(Method::Method& method, Method::MarkType mark)                                            \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, 0, 0, 0, 0, mark)                                                            \
 }

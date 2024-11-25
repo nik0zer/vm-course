@@ -10,7 +10,7 @@ namespace Method
 using RegValue = int64_t;
 using RegType = uint16_t;
 using ImmType = RegValue;
-using MarkType = std::string;
+using OffsetType = int32_t;
 using OpcodeType = uint8_t;
 
 enum class OpcodeTable : OpcodeType
@@ -37,17 +37,21 @@ struct Instr
 {
   OpcodeTable opcode;
   RegType rd, rs1, rs2;
-  ImmType immedeate;
-  MarkType mark;
+  ImmType imm;
+  OffsetType offset;
 };
 
 class Method
 {
+  private:
     RegType paramsSize_;
     RegType localRegisters_;
     RegType allRegisters_;
-    std::unordered_map<std::string, RegValue> marks;
-    std::vector<Instr> instructionSet_;
+    // std::unordered_map<std::string, RegValue> marks; //offset
+    // std::vector<Instr> instructions_;
+    // std::array байткода выделенный через mmap
+    // loadbytecode template (указатель)
+
   public:
     Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters),
     localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), marks() {}
@@ -57,7 +61,7 @@ class Method
     inline const RegType &paramsSize() {return paramsSize_;}
     inline const RegType &localRegisters() {return localRegisters_;}
     inline const RegType &allRegisters() {return allRegisters_;}
-    inline const Instr &getInstr(const RegValue &pc) {return instructionSet_[pc];}
+    inline const Instr &getInstr(const RegValue &pc) {return instructions_[pc];}
     inline const RegValue &getMark(const std::string mark) {return marks[mark];}
 
     void createMark(const MarkType mark);

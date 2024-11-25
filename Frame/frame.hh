@@ -1,23 +1,26 @@
 #pragma once
+
 #include "method.hh"
 #include <memory>
-#include <stdexcept>
+// #include <stdexcept>
 #include <algorithm>
 
 namespace Frame
 {
 
+#define MAX_REG_FILE_SIZE 1024
+
 class Frame
 {
   private:
     Method::Method *method;
-    Method::RegValue *regFile_;
+    Method::RegValue regFile_[MAX_REG_FILE_SIZE] {};
     Method::RegValue PC {0};
     Frame *prevFrame_;
+    Method::RegValue accumulator_;
 
   public:
-    Frame(Method::Method *method, Frame* prevFrame) : method(method), prevFrame_(prevFrame), 
-    regFile_(new Method::RegValue[method->allRegisters()]) {}
+    Frame(Method::Method *method, Frame* prevFrame) : method(method), prevFrame_(prevFrame) {}
 
     Frame() {}
 

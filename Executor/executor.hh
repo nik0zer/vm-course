@@ -1,25 +1,23 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
 #include "frame.hh"
-#include <unordered_map>
+
+#include <vector>
 
 #define MAX_STACK_DEPTH 1024
 
-#define COMPUTED_GOTO
+// #define COMPUTED_GOTO
 
 class Executor {
   private:
     Frame::Frame callStack_[MAX_STACK_DEPTH] {};
-    Method::Method *cleanMethodList_;
+    std::vector<Method::Method *> methodList_;
 
-    void handleCall(const std::string& callMethod);
-
+    void handleCall(int callMethod);
     Frame::Frame *stackPtr_ { &callStack_[MAX_STACK_DEPTH - 1] };
 
   public:
-    Executor(Method::Method *methods) : cleanMethodList_(methods) {};
+    Executor(Method::Method *methods) : methodList_() {};
+
     void simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame);
 };
