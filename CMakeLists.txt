@@ -13,7 +13,6 @@ set(MAIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/main)
 set(VM_SRC
 ${MAIN_DIR}/main.cpp
 ${EXECUTOR_DIR}/executor.cpp
-${METHOD_DIR}/method.cpp
 ${EMITTER_DIR}/emitter.cpp
 )
 

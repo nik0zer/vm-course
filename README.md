@@ -8,7 +8,7 @@ Klimentieva Maria https://github.com/MariaKlimenteva
 
 ### Registers   
 Each method keeps informations about number of call parameters (N) and number of registers needed for local
-variables(M). When calls, method allocate N + M registers in registers [0:N-1] the arguments of the function lie. Other can be used as local variables.
+variables(M). When calls, method allocate N + M registers in registers [0:N-1] the arguments of the function lie. Other can be used as local variables. Availible maximum of local Registers is 1024. 
 
 ### Accumulator (acc)   
 Special register witch state doesn't reset when method's frame ends. At the start of method must be treated as contains trash. After call any method, acc contains return value from called method. 
@@ -20,7 +20,7 @@ All instrations which operates with values contains postfix \<type\> that shows 
 All jumps use list of marks whith every method holds, so jumps only availible in method range. In bytecode transforms to <opcode> <offset>
 
 ### Calls
-When method calls first (K) registers [0:K-1] threated as parameters, when method returns value in accumulator threated as return value.
+When method calls first (K) registers [0:K-1] threated as parameters, when method returns value in accumulator threated as return value. Max depth of frame stack is 1024
 
 </details>
 

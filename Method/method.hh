@@ -47,24 +47,26 @@ class Method
     RegType paramsSize_;
     RegType localRegisters_;
     RegType allRegisters_;
-    // std::unordered_map<std::string, RegValue> marks; //offset
-    // std::vector<Instr> instructions_;
-    // std::array байткода выделенный через mmap
-    // loadbytecode template (указатель)
+    RegValue bytecodeSize_;
+    const uint8_t *bytecode_;
 
   public:
-    Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters) : paramsSize_(numOfParamenters),
-    localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters), marks() {}
+    Method(const RegType &numOfParamenters, const RegType &numOfLocalRegisters, const RegValue &bytecodeSize,
+    const uint8_t *bytecode) : 
+    paramsSize_(numOfParamenters), bytecodeSize_(bytecodeSize), bytecode_(bytecode),
+    localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters) {}
+    ~Method() { delete bytecode_; }
 
     void addInstruction(Instr instr);
 
     inline const RegType &paramsSize() {return paramsSize_;}
     inline const RegType &localRegisters() {return localRegisters_;}
     inline const RegType &allRegisters() {return allRegisters_;}
-    inline const Instr &getInstr(const RegValue &pc) {return instructions_[pc];}
-    inline const RegValue &getMark(const std::string mark) {return marks[mark];}
 
-    void createMark(const MarkType mark);
+    template <typename ValType>
+    inline const ValType &getBytecode(RegValue pc) { return *(reinterpret_cast<ValType *>(bytecode_ + pc)); } 
 };
+
+// rs1: frame->getBytecode<RegType>(); frame->setPC(frame->getPC() + sizeof(RegType));
 
 }

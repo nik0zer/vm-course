@@ -45,14 +45,10 @@ class Frame
         return PC;
     }
 
-    inline const Method::Instr &getInstrPC()
+    template <typename ValType>
+    inline const ValType &getBytecodePC()
     {
-        return method->getInstr(PC);
-    }
-
-    inline const Method::RegValue &getMark(const std::string &mark)
-    {
-        return method->getMark(mark);
+        return method->getBytecode(PC);
     }
 
     inline void copyParams(const Frame &otherFrame)
