@@ -2,22 +2,22 @@
 #include "method.hh"
 
 #define CREATE_INSTR(method, opcode, rd, rs1, rs2, imm, mark)                                               \
-emit(method, Frame::Instr {opcode, rd, rs1, rs2, imm, mark});
+emit(method, Method::Instr {opcode, rd, rs1, rs2, imm, mark});
 
 #define CREATE_ARITHMETIC_INSTR(opcode, name)                                                               \
-void create##name(Frame::Method& method, Frame::RegType rd, Frame::RegType rs1, Frame::RegType rs2)         \
+void create##name(Method::Method& method, Method::RegType rd, Method::RegType rs1, Method::RegType rs2)         \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, rd, rs1, rs2, 0, "")                                                         \
 }
 
 #define CREATE_COMPARE_INSTR(opcode, name)                                                                  \
-void create##name(Frame::Method& method, Frame::RegType rs1, Frame::RegType rs2)                            \
+void create##name(Method::Method& method, Method::RegType rs1, Method::RegType rs2)                            \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, 0, rs1, rs2, 0, "")                                                          \
 }                                                                                                           
 
 #define CREATE_JMP_INSTR(opcode, name)                                                                      \
-void create##name(Frame::Method& method, Frame::MarkType mark)                                              \
+void create##name(Method::Method& method, Method::MarkType mark)                                              \
 {                                                                                                           \
   CREATE_INSTR(method, opcode, 0, 0, 0, 0, mark)                                                            \
 }
@@ -26,56 +26,56 @@ void create##name(Frame::Method& method, Frame::MarkType mark)                  
 
 class Emitter {
   private:
-    void emit(Frame::Method& method, Frame::Instr inst);
+    void emit(Method::Method& method, Method::Instr inst);
 
   public:
     Emitter() {};
-    void createMv(Frame::Method& method, Frame::RegType reg, Frame::ImmType imm)
+    void createMv(Method::Method& method, Method::RegType reg, Method::ImmType imm)
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::MV, reg, 0, 0, imm, "")
+      CREATE_INSTR(method, Method::OpcodeTable::MV, reg, 0, 0, imm, "")
     }
 
-    void createStacc(Frame::Method& method, Frame::RegType reg) 
+    void createStacc(Method::Method& method, Method::RegType reg) 
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::STACC, 0, reg, 0, 0, "")
+      CREATE_INSTR(method, Method::OpcodeTable::STACC, 0, reg, 0, 0, "")
     }
 
-    void createLdacc(Frame::Method& method, Frame::RegType reg) 
+    void createLdacc(Method::Method& method, Method::RegType reg) 
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::LDACC, reg, 0, 0, 0, "")
+      CREATE_INSTR(method, Method::OpcodeTable::LDACC, reg, 0, 0, 0, "")
     }
 
-    CREATE_ARITHMETIC_INSTR(Frame::OpcodeTable::ADD, Add)
-    CREATE_ARITHMETIC_INSTR(Frame::OpcodeTable::SUB, Sub)
-    CREATE_ARITHMETIC_INSTR(Frame::OpcodeTable::DIV, Div)
-    CREATE_ARITHMETIC_INSTR(Frame::OpcodeTable::MUL, Mul)
+    CREATE_ARITHMETIC_INSTR(Method::OpcodeTable::ADD, Add)
+    CREATE_ARITHMETIC_INSTR(Method::OpcodeTable::SUB, Sub)
+    CREATE_ARITHMETIC_INSTR(Method::OpcodeTable::DIV, Div)
+    CREATE_ARITHMETIC_INSTR(Method::OpcodeTable::MUL, Mul)
 
-    CREATE_COMPARE_INSTR(Frame::OpcodeTable::CMPEQ, Cmpeq)
-    CREATE_COMPARE_INSTR(Frame::OpcodeTable::CMPGT, Cmpgt)
-    CREATE_COMPARE_INSTR(Frame::OpcodeTable::CMPGE, Cmpge)
+    CREATE_COMPARE_INSTR(Method::OpcodeTable::CMPEQ, Cmpeq)
+    CREATE_COMPARE_INSTR(Method::OpcodeTable::CMPGT, Cmpgt)
+    CREATE_COMPARE_INSTR(Method::OpcodeTable::CMPGE, Cmpge)
     
-    CREATE_JMP_INSTR(Frame::OpcodeTable::JMP, Jmp)
-    CREATE_JMP_INSTR(Frame::OpcodeTable::CJMPT, Cjmpt)
-    CREATE_JMP_INSTR(Frame::OpcodeTable::CJMPF, Cjmpf)
+    CREATE_JMP_INSTR(Method::OpcodeTable::JMP, Jmp)
+    CREATE_JMP_INSTR(Method::OpcodeTable::CJMPT, Cjmpt)
+    CREATE_JMP_INSTR(Method::OpcodeTable::CJMPF, Cjmpf)
 
-    void createCall(Frame::Method& method, Frame::MarkType mark)
+    void createCall(Method::Method& method, Method::MarkType mark)
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::CALL, 0, 0, 0, 0, mark)
+      CREATE_INSTR(method, Method::OpcodeTable::CALL, 0, 0, 0, 0, mark)
     }
 
-    void createRet(Frame::Method& method)
+    void createRet(Method::Method& method)
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::RET, 0, 0, 0, 0, "")
+      CREATE_INSTR(method, Method::OpcodeTable::RET, 0, 0, 0, 0, "")
     }   
 
-    void createMark(Frame::Method& method, Frame::MarkType mark)
+    void createMark(Method::Method& method, Method::MarkType mark)
     {
       method.createMark(mark);
     }
 
-    void createPrint(Frame::Method& method, Frame::MarkType description, Frame::RegType reg)
+    void createPrint(Method::Method& method, Method::MarkType description, Method::RegType reg)
     {
-      CREATE_INSTR(method, Frame::OpcodeTable::PRINT, 0, reg, 0, 0, description);
+      CREATE_INSTR(method, Method::OpcodeTable::PRINT, 0, reg, 0, 0, description);
     }
 
 };

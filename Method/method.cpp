@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-namespace Frame
+namespace Method
 {
 
 void Method::addInstruction(Instr instr)

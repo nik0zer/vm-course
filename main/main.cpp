@@ -4,7 +4,7 @@
 
 void FibsCycle(uint64_t n) {
     Emitter emit;
-    std::shared_ptr<Frame::Method> pMain(new Frame::Method(0, 5));
+    std::shared_ptr<Method::Method> pMain(new Method::Method(0, 5));
     emit.createMv(*pMain, 0, 1);
     emit.createMv(*pMain, 1, 1);
     emit.createMv(*pMain, 2, 1);
@@ -19,7 +19,7 @@ void FibsCycle(uint64_t n) {
     emit.createCjmpt(*pMain, "Cicle");
     emit.createPrint(*pMain, "fibonachi: ", 2);
     emit.createRet(*pMain);
-    std::unordered_map<std::string, std::shared_ptr<Frame::Method>> methods {};
+    std::unordered_map<std::string, std::shared_ptr<Method::Method>> methods {};
     methods["main"] = pMain;
     Executor exec(methods);
     exec.simpleInterpreter("main");
@@ -30,7 +30,7 @@ void FibsRecursion(uint64_t n)
 {
     Emitter emit;
 
-    std::shared_ptr<Frame::Method> Fibs(new Frame::Method(1, 5));
+    std::shared_ptr<Method::Method> Fibs(new Method::Method(1, 5));
     
     emit.createMv(*Fibs, 5, 2);
     emit.createCmpgt(*Fibs, 0, 5);
@@ -51,7 +51,7 @@ void FibsRecursion(uint64_t n)
     emit.createStacc(*Fibs, 3);
     emit.createRet(*Fibs);
 
-    std::shared_ptr<Frame::Method> pMain(new Frame::Method(0, 5));
+    std::shared_ptr<Method::Method> pMain(new Method::Method(0, 5));
 
     emit.createMv(*pMain, 0, n);
     emit.createCall(*pMain, "Fibs");
@@ -59,7 +59,7 @@ void FibsRecursion(uint64_t n)
     emit.createPrint(*pMain, "fib: ", 2);
     emit.createRet(*pMain);
 
-    std::unordered_map<std::string, std::shared_ptr<Frame::Method>> methods {};
+    std::unordered_map<std::string, std::shared_ptr<Method::Method>> methods {};
     methods["main"] = pMain;
     methods["Fibs"] = Fibs;
     Executor exec(methods);

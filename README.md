@@ -17,7 +17,7 @@ Special register witch state doesn't reset when method's frame ends. At the star
 All instrations which operates with values contains postfix \<type\> that shows types of operands in instruction. Now type only can be i64 refers to int64_t
 
 ### Jumps 
-All jumps use list of marks whith every method holds, so jumps only availible in method range.
+All jumps use list of marks whith every method holds, so jumps only availible in method range. In bytecode transforms to <opcode> <offset>
 
 ### Calls
 When method calls first (K) registers [0:K-1] threated as parameters, when method returns value in accumulator threated as return value.

@@ -10,55 +10,56 @@ namespace Frame
 class Frame
 {
   private:
-    std::shared_ptr<Method> method;
-    std::vector<RegValue> regFile_;
-    RegValue PC {0};
+    Method::Method *method;
+    Method::RegValue *regFile_;
+    Method::RegValue PC {0};
+    Frame *prevFrame_;
 
   public:
-    Frame(std::shared_ptr<Method> method) : method(method), regFile_(method->allRegisters()) {}
+    Frame(Method::Method *method, Frame* prevFrame) : method(method), prevFrame_(prevFrame), 
+    regFile_(new Method::RegValue[method->allRegisters()]) {}
 
-    inline const RegValue &getReg(const RegType &reg)
+    Frame() {}
+
+    inline const Method::RegValue &getReg(const Method::RegType &reg)
     {
-        if(reg >= method->allRegisters())
-        {
-            throw std::runtime_error("REG NUM OUT OF BOUNDS");
-        }
         return regFile_[reg];
     }
 
-    inline void setReg(const RegType &reg, const RegValue &val)
+    inline void setReg(const Method::RegType &reg, const Method::RegValue &val)
     {
-        if(reg >= method->allRegisters())
-        {
-            throw std::runtime_error("REG NUM OUT OF BOUNDS");
-        }
         regFile_[reg] = val;
     }
 
 
-    inline void setPC(const RegValue &pc)
+    inline void setPC(const Method::RegValue &pc)
     {
         PC = pc;
     }
 
-    inline const RegValue &getPC()
+    inline const Method::RegValue &getPC()
     {
         return PC;
     }
 
-    inline const Instr &getInstrPC()
+    inline const Method::Instr &getInstrPC()
     {
         return method->getInstr(PC);
     }
 
-    inline const RegValue &getMark(const std::string &mark)
+    inline const Method::RegValue &getMark(const std::string &mark)
     {
         return method->getMark(mark);
     }
 
     inline void copyParams(const Frame &otherFrame)
     {
-        std::copy_n(otherFrame.regFile_.begin(), method->paramsSize(), regFile_.begin());
+        std::copy_n(otherFrame.regFile_, method->paramsSize(), regFile_);
+    }
+
+    inline const Frame *getPrevFrame()
+    {
+        return prevFrame_;
     }
 
 
