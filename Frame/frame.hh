@@ -45,6 +45,16 @@ class Frame
         return PC;
     }
 
+    inline void setAcc(const Method::RegValue &acc)
+    {
+        accumulator_ = acc;
+    }
+
+    inline const Method::RegValue &getAcc()
+    {
+        return accumulator_;
+    }
+
     template <typename ValType>
     inline const ValType &getBytecodePC()
     {

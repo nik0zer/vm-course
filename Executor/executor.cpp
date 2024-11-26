@@ -3,64 +3,71 @@
 #include <cstdint>
 #include "all_instrs.hh"
 
-#define CASE_INSTR(opcode, name, size)          \
-    case opcode:                                \
-        handle##name(frame);                    \
-        break;
 
-#define GENERATE_DISPATCH_SWITCH(frame, opcode) \
-    switch (opcode) {                           \
-        ALL_INSTR_LIST(CASE_INSTR)              \
-    }
-
-
-#define SET_REG(reg, val)                                                   \
-    method->setReg(reg, val)
-
-#define GET_REG(reg)                                                        \
-    method->getReg(reg)
-
-#define MV(name)                                                            \
-inline void name (Method::RegType rd, Method::RegType imm) {                \
-    SET_REG(rd, imm);                                                       \
-}
-
-#define ARITHMETICAL(operator, name)                                        \
-inline void name (RegType rd, RegType rs1, RegType rs2) {                   \
-    SET_REG(rd, GET_REG(rs1) operator GET_REG(rs2));                        \
-}
-
-#define COMPARE(operator, name)                                             \
-inline void name (RegType rs1, RegType rs2) {                               \
-    accumulator_ = GET_REG(rs1) operator GET_REG(rs2) ;                     \
-}
-
-#define JUMP(conditional, name, offset)                                     \
-inline void name (RegType offset) {                                         \
-    if(conditional) {                                                       \
-        method->setPC(method->getMark(offset) - 1);                         \
-    }                                                                       \
-}
 
 namespace Executor
 {
 
-void Executor::handleCall(int callMethod)
-{
+#define CASE_INSTR(opcode, name, size)          \
+    case opcode:                                \
+        handle##name(frame, acc);               \
+        break;
 
+#define GENERATE_DISPATCH_SWITCH()                                                  \
+    while(true)                                                                     \
+    {                                                                               \
+        auto opcode = frame->getBytecodePC<const uint8_t>();                        \
+        switch (opcode) {                                                           \
+            ALL_INSTR_LIST(CASE_INSTR)                                              \
+        }                                                                           \
+    }
+
+
+#define SET_REG(method, reg, val)                                                   \
+    method->setReg(reg, val)
+
+#define GET_REG(method, reg)                                                        \
+    method->getReg(reg)
+
+#define SET_PC(method, pc)                                                          \
+    method->setPC(pc)
+
+#define GET_PC(method)                                                              \
+    method->getPC()
+
+static inline void handleMV(Frame::Frame *frame, Method::RegValue acc) {
+    auto reg = frame->getBytecodePC<const Method::RegType>();
+    auto imm = frame->getBytecodePC<const Method::ImmType>();
+    SET_REG(frame, reg, imm);
 }
+
+#define ARITHMETICAL(operator, name, acc)                                           \
+static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+    SET_REG(rd, GET_REG(rs1) operator GET_REG(rs2));                                \
+}
+
+#define COMPARE(operator, name, acc)                                                \
+static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+    accumulator_ = GET_REG(rs1) operator GET_REG(rs2) ;                             \
+}
+
+#define JUMP(conditional, name, offset, acc)                                        \
+static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+    auto offset = frame->getBytecodePC<const uint32_t>();                           \
+    SET_PC(frame, GET_PC(frame));                                                   \
+    if(conditional) {                                                               \
+        method->setPC(method->getMark(offset) - 1);                                 \
+    }                                                                               \
+}
+
 
 void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
 {
-
-#ifndef COMPUTED_GOTO
     uint64_t numOfOperations = 0;
-    while(true)
-    {
-        auto frame = stackPtr_;
-        auto opcode = frame->getBytecodePC<const uint8_t>();
-        GENERATE_DISPATCH_SWITCH(frame, opcode);
-    }
+    auto frame = stackPtr_;
+    auto acc = frame->getAcc();
+#ifndef COMPUTED_GOTO
+    GENERATE_DISPATCH_SWITCH()
 #endif
 }
 
