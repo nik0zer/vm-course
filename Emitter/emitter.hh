@@ -3,6 +3,7 @@
 #include "executor.hh"
 #include <vector>
 #include <map>
+#include "all_instrs.hh"
 
 namespace Executor
 {
@@ -40,7 +41,14 @@ class Emitter {
     void endEmitMethod(Executor::Executor &executor, Method::RegType params, Method::RegType localVars);
     void CreateMark(const std::string &markName);
 
-    // реализовать create меотды которые кладут инструкции в EmittedInstrs
+    #define DEFINE_CREATE_METHOD_DECLARATION(opcode, mnemonic, size) \
+    void Create##mnemonic(Method::RegType rd = 0, Method::ImmType imm = 0, Method::RegType rs1 = 0, Method::RegType rs2 = 0);\
+    void Create##mnemonic(Method::ImmType imm) { \
+      Create##mnemonic(0, imm, 0, 0); \
+    }
+    ALL_INSTR_LIST(DEFINE_CREATE_METHOD_DECLARATION)
+
+    #undef DEFINE_CREATE_METHOD_DECLARATION
 
 };
 
