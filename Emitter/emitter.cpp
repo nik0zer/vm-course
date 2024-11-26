@@ -5,13 +5,19 @@
 namespace Emitter
 {
 
+template<typename ValType>
+static void PutDataToBuffer(uint8_t **ptr, ValType val) {
+    *(reinterpret_cast<ValType *>(*ptr)) = val;
+    (*ptr) += sizeof(val);
+}
+
 void Emitter::startEmitMethod(const std::string &name) {
     marks = std::map<std::string, uint32_t>();
     if(std::find(methods.begin(), methods.end(), name) == methods.end())
     {
         methods.push_back(name);
     }
-    currName = name;    
+    currName = name;
 }
 
 void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params, Method::RegType localVars) {
@@ -24,10 +30,12 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     }
     uint8_t *buffer = static_cast<uint8_t *>(mmap(nullptr, methodSize,
     PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+    auto currDataPtr = buffer;
 
-    // загрузить инструкции в буффер пропатчив инструкции джампа (в джампе заменить марк на высчитанный офсет) 
-    // и кола (заменить марк функции на индекс функции найденный в векторе methods, 
-    // если его там нет то добавить его туда) 
+    // загрузить инструкции в буффер (используй функцию PutDataToBuffer с нужным типом передавая туда &currDataPtr,
+    // он положит и подвинет) пропатчив инструкции джампа (в джампе заменить марк на высчитанный офсет)
+    // и кола (заменить марк функции на индекс функции найденный в векторе methods,
+    // если его там нет то добавить его туда)
 
     Method::Method *method = new Method::Method(params, localVars, methodSize, buffer);
     if(executor.methodList_.size() <= index)

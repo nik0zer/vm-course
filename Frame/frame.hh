@@ -48,7 +48,7 @@ class Frame
     template <typename ValType>
     inline const ValType &getBytecodePC()
     {
-        return method->getBytecode(PC);
+        return method->getBytecode<ValType>(PC);
     }
 
     inline void copyParams(const Frame &otherFrame)
