@@ -65,7 +65,7 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     #define PUT_TO_BUF_MARK()                                           \
     currPosition += instr.instrSize;                                    \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode);    \
-    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(currPosition - marks[instr.mark])); 
+    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(currPosition - marks[instr.mark]));
 
     #define PUT_TO_BUF_CALL_MARK()\
     currPosition += instr.instrSize; \
@@ -76,7 +76,12 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
         methodIter = methods.insert(methodIter, instr.mark); \
     } \
     }\
-    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(std::distance(methods.begin(), methodIter))); 
+    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(std::distance(methods.begin(), methodIter)));
+
+    #define PUT_TO_BUF_CALL_NAPI() \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    PutDataToBuffer<Method::AddressType>(&currDataPtr, instr.address); \
+    currPosition += instr.instrSize;
 
     #define PUT_TO_BUF_OPCODE() \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
@@ -88,11 +93,11 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
         break;
 
     for (auto instr: EmittedInstrs) {
-        switch (instr.opcode) {                                                           
-            ALL_INSTR_LIST(CASE_INSTR)                                             
-        }  
+        switch (instr.opcode) {
+            ALL_INSTR_LIST(CASE_INSTR)
+        }
     }
-     
+
 
     Method::Method *method = new Method::Method(params, localVars, methodSize, buffer);
     if(executor.methodList_.size() <= index)
@@ -142,7 +147,7 @@ void Emitter::Create##mnemonic(Method::RegType rd, Method::RegType rs1, Method::
     instr.rs2 = rs2;                                                                                                \
     instr.instrSize = SIZE_##format;                                                                                \
     EmittedInstrs.push_back(instr);                                                                                 \
-}   
+}
 
 #define GEN_CREATE_REGIN_2(num_opcode, mnemonic, format)                   \
 void Emitter::Create##mnemonic(Method::RegType rs1, Method::RegType rs2) { \
@@ -152,7 +157,7 @@ void Emitter::Create##mnemonic(Method::RegType rs1, Method::RegType rs2) { \
     instr.rs2 = rs2;                                                       \
     instr.instrSize = SIZE_##format;                                       \
     EmittedInstrs.push_back(instr);                                        \
-} 
+}
 
 #define GEN_CREATE_MARK(num_opcode, mnemonic, format)           \
 void Emitter::Create##mnemonic(Method::MarkType mark_name) {    \
@@ -161,7 +166,7 @@ void Emitter::Create##mnemonic(Method::MarkType mark_name) {    \
     instr.mark = mark_name;                                     \
     instr.instrSize = SIZE_##format;                            \
     EmittedInstrs.push_back(instr);                             \
-} 
+}
 
 #define GEN_CREATE_CALL_MARK(num_opcode, mnemonic, format)      \
 void Emitter::Create##mnemonic(Method::MarkType call_name) {    \
@@ -172,13 +177,22 @@ void Emitter::Create##mnemonic(Method::MarkType call_name) {    \
     EmittedInstrs.push_back(instr);                             \
 }
 
+#define GEN_CREATE_CALL_NAPI(num_opcode, mnemonic, format)          \
+void Emitter::Create##mnemonic(Method::AddressType address) {       \
+    emitterInstr instr{};                                           \
+    instr.opcode = num_opcode;                                      \
+    instr.address = address;                                        \
+    instr.instrSize = SIZE_##format;                                \
+    EmittedInstrs.push_back(instr);                                 \
+}
+
 #define GEN_CREATE_OPCODE(num_opcode, mnemonic, format) \
 void Emitter::Create##mnemonic() {                      \
     emitterInstr instr{};                               \
     instr.opcode = num_opcode;                          \
     instr.instrSize = SIZE_##format;                    \
     EmittedInstrs.push_back(instr);                     \
-} 
+}
 
 #define DEFINE_CREATE_METHOD_DEFINITION(num_opcode, mnemonic, format) \
     GEN_CREATE_##format(num_opcode, mnemonic, format)                 \

@@ -77,7 +77,7 @@ COMPARE(>=, CMPGE, acc)
 
 #define JUMP(conditional, name, acc)                                                                    \
 static inline void handle##name (Executor *executor, Frame::Frame *frame, Method::RegValue& acc) {      \
-    auto offset = frame->getBytecodePC<const uint32_t>();                                               \
+    auto offset = frame->getBytecodePC<const Method::OffsetType>();                                     \
     if(conditional) {                                                                                   \
         SET_PC(frame, GET_PC(frame));                                                                   \
     }                                                                                                   \
@@ -99,7 +99,7 @@ static inline void handleCALL(Executor *executor, Frame::Frame *frame, Method::R
     return;
 
 static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Method::RegValue &acc) {
-    auto address = const_cast<uint8_t *>(frame->getBytecodePC<const uint8_t *>());
+    auto address = const_cast<uint8_t *>(frame->getBytecodePC<Method::AddressType>());
     frame->setAcc(acc);
     executor->nativeExecute(address, frame);
 }

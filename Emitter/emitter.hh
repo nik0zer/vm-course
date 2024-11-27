@@ -20,6 +20,7 @@ struct emitterInstr
   Method::ImmType imm;
   Method::RegType rs1, rs2, rd;
   std::string mark;
+  Method::AddressType address;
   uint8_t instrSize;
 };
 
@@ -47,10 +48,11 @@ class Emitter {
     #define DECLARE_REGIN_2(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rs1, Method::RegType rs2);
     #define DECLARE_MARK(num_opcode, mnemonic, format) void Create##mnemonic(Method::MarkType mark_name);
     #define DECLARE_CALL_MARK(num_opcode, mnemonic, format) void Create##mnemonic(Method::MarkType call_name);
+    #define DECLARE_CALL_NAPI(num_opcode, mnemonic, format) void Create##mnemonic(Method::AddressType address);
     #define DECLARE_OPCODE(num_opcode, mnemonic, format) void Create##mnemonic();
 
     #define DECLARE_CREATES(num_opcode, mnemonic, format)                   \
-      DECLARE_##format(num_opcode, mnemonic, format) 
+      DECLARE_##format(num_opcode, mnemonic, format)
 
 
     ALL_INSTR_LIST(DECLARE_CREATES)
@@ -62,6 +64,7 @@ class Emitter {
     #undef DECLARE_REGIN_2
     #undef DECLARE_MARK
     #undef DECLARE_CALL_MARK
+    #undef DECLARE_CALL_NAPI
     #undef DECLARE_OPCODE
 
 };
