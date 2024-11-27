@@ -32,12 +32,7 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     uint8_t *buffer = static_cast<uint8_t *>(mmap(nullptr, methodSize,
     PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
     auto currDataPtr = buffer;
-
-    // загрузить инструкции в буффер (используй функцию PutDataToBuffer с нужным типом передавая туда &currDataPtr,
-    // он положит и подвинет) пропатчив инструкции джампа (в джампе заменить марк на высчитанный офсет)
-    // и кола (заменить марк функции на индекс функции найденный в векторе methods,
-    // если его там нет то добавить его туда)
-
+    
     #define PUT_TO_BUF_IMM_1_REG_1()                                    \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode);    \
     PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rd);           \

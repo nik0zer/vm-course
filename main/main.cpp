@@ -83,6 +83,7 @@ void FibsRecursion(uint64_t n)
 
 int main()
 {
-    FibsRecursion(14);
+    FibsRecursion(15);
+    FibsCycle(14);
     return 0;
 }
