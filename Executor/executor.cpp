@@ -16,6 +16,7 @@ namespace Executor
 #define GENERATE_DISPATCH_SWITCH()                                                  \
     while(true)                                                                     \
     {                                                                               \
+        numOfOperations++;                                                          \
         auto opcode = frame->getBytecodePC<Method::OpcodeType>();                   \
         switch (opcode) {                                                           \
             ALL_INSTR_LIST(CASE_INSTR)                                              \
@@ -108,7 +109,6 @@ static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Metho
 
 void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
 {
-    uint64_t numOfOperations = 0;
     auto frame = new (stackPtr_) Frame::Frame(method, prevFrame, &stackPtr_);
     auto acc = frame->getAcc();
 #ifndef COMPUTED_GOTO
