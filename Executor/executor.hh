@@ -2,6 +2,7 @@
 
 #include "frame.hh"
 #include "emitter.hh"
+#include "method.hh"
 
 #include <vector>
 
@@ -27,12 +28,16 @@ class Executor {
 
   public:
     Executor() {
-      stackMem_ = new uint8_t[STACK_MEM_SIZE]; 
+      stackMem_ = new uint8_t[STACK_MEM_SIZE];
       stackPtr_ = stackMem_;
     };
 
     ~Executor() {
       delete[] stackMem_;
+    }
+
+    inline Method::Method *getMethod(Method::ImmType mark) {
+      return methodList_[mark];
     }
 
     void simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame);

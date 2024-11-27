@@ -21,7 +21,7 @@ class Frame
 
 
   public:
-    Frame(Method::Method *method, Frame* prevFrame, uint8_t** stackPtr) : method(method), prevFrame_(prevFrame) 
+    Frame(Method::Method *method, Frame* prevFrame, uint8_t** stackPtr) : method(method), prevFrame_(prevFrame)
     {
         new (&regFile_) Method::RegValue[method->allRegisters()];
         (*stackPtr) = reinterpret_cast<uint8_t *>(&(regFile_[method->allRegisters() + 1]));
@@ -63,6 +63,8 @@ class Frame
     template <typename ValType>
     inline const ValType &getBytecodePC()
     {
+        auto pc = PC;
+        PC += sizeof(ValType);
         return method->getBytecode<ValType>(PC);
     }
 
@@ -71,7 +73,7 @@ class Frame
         std::copy_n(otherFrame.regFile_, method->paramsSize(), regFile_);
     }
 
-    inline const Frame *getPrevFrame()
+    inline Frame *getPrevFrame()
     {
         return prevFrame_;
     }
