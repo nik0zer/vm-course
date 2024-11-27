@@ -40,6 +40,11 @@ class Executor {
       return methodList_[mark];
     }
 
+    inline void Run(Method::ImmType callIndex)
+    {
+      simpleInterpreterExecute(getMethod(callIndex), nullptr);
+    }
+
     void simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame);
 
     void nativeExecute(void *nativeMethod, Frame::Frame *prevFrame);

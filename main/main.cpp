@@ -1,6 +1,13 @@
 #include "emitter.hh"
 #include "executor.hh"
+#include "frame.hh"
+#include "method.hh"
 #include <iostream>
+
+void napiPrint(Frame::Frame *frame)
+{
+    std::cout << "reg 0: " << frame->getReg(0) << std::endl;
+}
 
 void FibsCycle(uint64_t n) {
     // Emitter emit;
@@ -23,6 +30,16 @@ void FibsCycle(uint64_t n) {
     // methods["main"] = pMain;
     // Executor exec(methods);
     // exec.simpleInterpreter("main");
+
+    auto exec = new Executor::Executor();
+    auto emitter = new Emitter::Emitter();
+    emitter->startEmitMethod("main");
+    emitter->CreateMV(0, 5);
+    emitter->CreateCALLNAPI(reinterpret_cast<Method::AddressType>(&napiPrint));
+    emitter->CreateRET();
+    emitter->endEmitMethod(*exec, 0, 5);
+
+    exec->Run(0);
 
 };
 
@@ -69,6 +86,6 @@ void FibsRecursion(uint64_t n)
 
 int main()
 {
-    FibsRecursion(11);
+    FibsCycle(11);
     return 0;
 }

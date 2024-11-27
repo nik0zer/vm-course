@@ -16,7 +16,7 @@ namespace Executor
 #define GENERATE_DISPATCH_SWITCH()                                                  \
     while(true)                                                                     \
     {                                                                               \
-        auto opcode = frame->getBytecodePC<const uint8_t>();                        \
+        auto opcode = frame->getBytecodePC<Method::OpcodeType>();                   \
         switch (opcode) {                                                           \
             ALL_INSTR_LIST(CASE_INSTR)                                              \
         }                                                                           \
@@ -95,7 +95,7 @@ static inline void handleCALL(Executor *executor, Frame::Frame *frame, Method::R
 
 #define handleRET(this, frame, acc)                                                                     \
     frame->setAcc(acc);                                                                                 \
-    frame->getPrevFrame()->setAcc(acc);                                                                 \
+    if(prevFrame != frame->getPrevFrame()) { frame->getPrevFrame()->setAcc(acc); }                      \
     return;
 
 static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Method::RegValue &acc) {
