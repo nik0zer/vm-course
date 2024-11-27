@@ -52,7 +52,7 @@ static inline void handleLDACC(Frame::Frame *frame, Method::RegValue &acc) {
 }
 
 #define ARITHMETICAL(operator, name, acc)                                           \
-static inline void name (Frame::Frame *frame, Method::RegValue &##acc) {            \
+static inline void handle##name (Frame::Frame *frame, Method::RegValue &##acc) {            \
     SET_REG(rd, GET_REG(rs1) operator GET_REG(rs2));                                \
 }
 

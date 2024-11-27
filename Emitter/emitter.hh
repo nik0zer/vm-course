@@ -41,14 +41,26 @@ class Emitter {
     void endEmitMethod(Executor::Executor &executor, Method::RegType params, Method::RegType localVars);
     void CreateMark(const std::string &markName);
 
-    #define DEFINE_CREATE_METHOD_DECLARATION(opcode, mnemonic, size) \
-    void Create##mnemonic(Method::RegType rd = 0, Method::ImmType imm = 0, Method::RegType rs1 = 0, Method::RegType rs2 = 0);\
-    void Create##mnemonic(Method::ImmType imm) { \
-      Create##mnemonic(0, imm, 0, 0); \
-    }
-    ALL_INSTR_LIST(DEFINE_CREATE_METHOD_DECLARATION)
+    #define DECLARE_IMM_1_REG_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rd, Method::ImmType imm);
+    #define DECLARE_REG_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rs1);
+    #define DECLARE_REG_3(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rd, Method::ImmType imm, Method::RegType rs1, Method::RegType rs2);
+    #define DECLARE_REGIN_2(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rs1, Method::RegType rs2);
+    #define DECLARE_IMM_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::ImmType imm);
+    #define DECLARE_OPCODE(num_opcode, mnemonic, format) void Create##mnemonic();
 
-    #undef DEFINE_CREATE_METHOD_DECLARATION
+    ALL_INSTR_LIST(DECLARE_IMM_1_REG_1)
+    ALL_INSTR_LIST(DECLARE_REG_1)
+    ALL_INSTR_LIST(DECLARE_REG_3)
+    ALL_INSTR_LIST(DECLARE_REGIN_2)
+    ALL_INSTR_LIST(DECLARE_IMM_1)
+    ALL_INSTR_LIST(DECLARE_OPCODE)
+
+    #undef DECLARE_IMM_1_REG_1
+    #undef DECLARE_REG_1
+    #undef DECLARE_REG_3
+    #undef DECLARE_REGIN_2
+    #undef DECLARE_IMM_1
+    #undef DECLARE_OPCODE
 
 };
 

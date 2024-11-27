@@ -56,20 +56,66 @@ void Emitter::CreateMark(const std::string &markName)
     marks[markName] = markAddress;
 }
 
-#define GEN_CREATE_REG_1                \
+
+#define GEN_CREATE_IMM_1_REG_1(num_opcode, mnemonic, format)              \
+void Emitter::Create##mnemonic(Method::RegType rd, Method::ImmType imm) { \
+    emitterInstr instr{};                                                 \
+    instr.opcode = num_opcode;                                            \
+    instr.imm = imm;                                                      \
+    instr.instrSize = SIZE_##format;                                      \
+    EmittedInstrs.push_back(instr);                                       \
+}
+
+#define GEN_CREATE_REG_1(num_opcode, mnemonic, format) \
+void Emitter::Create##mnemonic(Method::RegType rs1) {  \
+    emitterInstr instr{};                              \
+    instr.opcode = num_opcode;                         \
+    instr.rs1 = rs1;                                   \
+    instr.instrSize = SIZE_##format;                   \
+    EmittedInstrs.push_back(instr);                    \
+}
+
+#define GEN_CREATE_REG_3(num_opcode, mnemonic, format)                                                              \
 void Emitter::Create##mnemonic(Method::RegType rd, Method::ImmType imm, Method::RegType rs1, Method::RegType rs2) { \
     emitterInstr instr{};                                                                                           \
-    instr.opcode = num_opcode;                                                                                          \
+    instr.opcode = num_opcode;                                                                                      \
     instr.rd = rd;                                                                                                  \
     instr.imm = imm;                                                                                                \
     instr.rs1 = rs1;                                                                                                \
     instr.rs2 = rs2;                                                                                                \
-    instr.instrSize = size;                                                                                         \
+    instr.instrSize = SIZE_##format;                                                                                \
     EmittedInstrs.push_back(instr);                                                                                 \
-}                                 
+}   
 
-#define DEFINE_CREATE_METHOD_DEFINITION(num_opcode, mnemonic, format)           \
-    GEN_CREATE_##format()
+#define GEN_CREATE_REGIN_2(num_opcode, mnemonic, format)                   \
+void Emitter::Create##mnemonic(Method::RegType rs1, Method::RegType rs2) { \
+    emitterInstr instr{};                                                  \
+    instr.opcode = num_opcode;                                             \
+    instr.rs1 = rs1;                                                       \
+    instr.rs2 = rs2;                                                       \
+    instr.instrSize = SIZE_##format;                                       \
+    EmittedInstrs.push_back(instr);                                        \
+} 
+
+#define GEN_CREATE_IMM_1(num_opcode, mnemonic, format) \
+void Emitter::Create##mnemonic(Method::ImmType imm) {  \
+    emitterInstr instr{};                              \
+    instr.opcode = num_opcode;                         \
+    instr.imm = imm;                                   \
+    instr.instrSize = SIZE_##format;                   \
+    EmittedInstrs.push_back(instr);                    \
+} 
+
+#define GEN_CREATE_OPCODE(num_opcode, mnemonic, format) \
+void Emitter::Create##mnemonic() {                      \
+    emitterInstr instr{};                               \
+    instr.opcode = num_opcode;                          \
+    instr.instrSize = SIZE_##format;                    \
+    EmittedInstrs.push_back(instr);                     \
+} 
+
+#define DEFINE_CREATE_METHOD_DEFINITION(num_opcode, mnemonic, format) \
+    GEN_CREATE_##format(num_opcode, mnemonic, format)                 \
 
 ALL_INSTR_LIST(DEFINE_CREATE_METHOD_DEFINITION)
 
