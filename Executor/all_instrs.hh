@@ -23,9 +23,9 @@ constexpr uint8_t SIZE_REGIN_2 = sizeof(Method::OpcodeType) + sizeof(Method::Reg
     _(7, CMPEQ, REGIN_2)                                                            \
     _(8, CMPGT, REGIN_2)                                                            \
     _(9, CMPGE, REGIN_2)                                                            \
-    _(10, JMP, IMM_1)                                                               \
-    _(11, CJMPT, IMM_1)                                                             \
-    _(12, CJMPF, IMM_1)                                                             \
-    _(13, CALL, IMM_1)                                                              \
+    _(10, JMP, JUMP)                                                               \
+    _(11, CJMPT, JUMP)                                                             \
+    _(12, CJMPF, JUMP)                                                             \
+    _(13, CALL, CALL)                                                              \
     _(14, RET, OPCODE)                                                              \
-    _(15, CALLNAPI, IMM_1)
+    _(15, CALLNAPI, CALL)

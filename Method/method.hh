@@ -12,6 +12,7 @@ using RegType = uint16_t;
 using ImmType = RegValue;
 using OffsetType = int32_t;
 using OpcodeType = uint8_t;
+using MarkType = std::string;
 
 enum class OpcodeTable : OpcodeType
 {
@@ -33,14 +34,6 @@ enum class OpcodeTable : OpcodeType
   PRINT = 15,
 };
 
-struct Instr
-{
-  OpcodeTable opcode;
-  RegType rd, rs1, rs2;
-  ImmType imm;
-  OffsetType offset;
-};
-
 class Method
 {
   private:
@@ -57,7 +50,7 @@ class Method
     localRegisters_(numOfLocalRegisters), allRegisters_(paramsSize_ + numOfLocalRegisters) {}
     ~Method() { delete bytecode_; }
 
-    void addInstruction(Instr instr);
+    // void addInstruction(Instr instr);
 
     inline const RegType &paramsSize() {return paramsSize_;}
     inline const RegType &localRegisters() {return localRegisters_;}

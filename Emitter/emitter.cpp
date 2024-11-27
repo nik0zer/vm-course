@@ -40,26 +40,49 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     #define PUT_TO_BUF_IMM_1_REG_1() \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
     PutDataToBuffer<Method::ImmType>(&currDataPtr, instr.imm); \
-    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rd);
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rd); \
+    currPosition += instr.instrSize;
 
     #define PUT_TO_BUF_REG_1() \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
-    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs1);
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs1); \
+    currPosition += instr.instrSize;
 
     #define PUT_TO_BUF_REG_3() \
-
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs1); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs2); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rd); \
+    currPosition += instr.instrSize;
 
     #define PUT_TO_BUF_REGIN_2() \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs1); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs2); \
+    currPosition += instr.instrSize;
 
 
-    #define PUT_TO_BUF_IMM_1() \
+    #define PUT_TO_BUF_JUMP() \
+    currPosition += instr.instrSize; \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    Method::OffsetType offset = currPosition - marks[instr.mark]; \
+    PutDataToBuffer<Method::OffsetType>(&currDataPtr, offset); 
+
+    #define PUT_TO_BUF_CALL()\
+    currPosition += instr.instrSize; \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    auto methodIter = std::find(methods.begin(), methods.end(), instr.mark);
+    auto index = std::distance(methods.begin(), methodIter);
+
 
     #define PUT_TO_BUF_OPCODE() \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    currPosition += instr.instrSize;
 
 
-    #define CASE_INSTR(opcode, mnemonic, format)                                              \
-    case opcode:                                                                    \
-        PUT_TO_BUF_##format();                                                   \
+    #define CASE_INSTR(opcode, mnemonic, format)  \
+    case opcode:                                  \
+        PUT_TO_BUF_##format();                    \
         break;
 
     for (auto instr: EmittedInstrs) {
@@ -129,14 +152,23 @@ void Emitter::Create##mnemonic(Method::RegType rs1, Method::RegType rs2) { \
     EmittedInstrs.push_back(instr);                                        \
 } 
 
-#define GEN_CREATE_IMM_1(num_opcode, mnemonic, format) \
-void Emitter::Create##mnemonic(Method::ImmType imm) {  \
+#define GEN_CREATE_JUMP(num_opcode, mnemonic, format) \
+void Emitter::Create##mnemonic(Method::MarkType mark_name) {  \
     emitterInstr instr{};                              \
     instr.opcode = num_opcode;                         \
-    instr.imm = imm;                                   \
+    instr.mark = mark_name;                                   \
     instr.instrSize = SIZE_##format;                   \
     EmittedInstrs.push_back(instr);                    \
 } 
+
+#define GEN_CREATE_CALL(num_opcode, mnemonic, format) \
+void Emitter::Create##mnemonic(Method::MarkType call_name) { \
+    emitterInstr instr{};                              \
+    instr.opcode = num_opcode;                         \
+    instr.mark = call_name;                            \
+    instr.instrSize = SIZE_##format;                   \
+    EmittedInstrs.push_back(instr);                    \
+}
 
 #define GEN_CREATE_OPCODE(num_opcode, mnemonic, format) \
 void Emitter::Create##mnemonic() {                      \

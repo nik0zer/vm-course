@@ -28,6 +28,7 @@ class Emitter {
   private:
     std::vector<emitterInstr> EmittedInstrs {};
     std::string currName;
+    uint32_t currPosition = 0;
     Method::RegType params {0};
     Method::RegType localVars {0};
 
