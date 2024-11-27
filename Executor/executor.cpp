@@ -8,9 +8,9 @@
 namespace Executor
 {
 
-#define CASE_INSTR(opcode, name, size)          \
-    case opcode:                                \
-        handle##name(frame, acc);               \
+#define CASE_INSTR(opcode, name, size)                                              \
+    case opcode:                                                                    \
+        handle##name(frame, acc);                                                   \
         break;
 
 #define GENERATE_DISPATCH_SWITCH()                                                  \
@@ -35,24 +35,34 @@ namespace Executor
 #define GET_PC(method)                                                              \
     method->getPC()
 
-static inline void handleMV(Frame::Frame *frame, Method::RegValue acc) {
+static inline void handleMV(Frame::Frame *frame, Method::RegValue &acc) {
     auto reg = frame->getBytecodePC<const Method::RegType>();
     auto imm = frame->getBytecodePC<const Method::ImmType>();
     SET_REG(frame, reg, imm);
 }
 
+static inline void handleSTACC(Frame::Frame *frame, Method::RegValue &acc) {
+    auto reg = frame->getBytecodePC<const Method::RegType>();
+    acc = GET_REG(frame, reg);
+}
+
+static inline void handleLDACC(Frame::Frame *frame, Method::RegValue &acc) {
+    auto reg = frame->getBytecodePC<const Method::RegType>();
+    SET_REG(frame, reg, acc);
+}
+
 #define ARITHMETICAL(operator, name, acc)                                           \
-static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+static inline void name (Frame::Frame *frame, Method::RegValue &##acc) {            \
     SET_REG(rd, GET_REG(rs1) operator GET_REG(rs2));                                \
 }
 
 #define COMPARE(operator, name, acc)                                                \
-static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+static inline void name (Frame::Frame *frame, Method::RegValue &##acc) {            \
     accumulator_ = GET_REG(rs1) operator GET_REG(rs2) ;                             \
 }
 
 #define JUMP(conditional, name, offset, acc)                                        \
-static inline void name (Frame::Frame *frame, Method::RegValue ##acc) {             \
+static inline void name (Frame::Frame *frame, Method::RegValue &##acc) {            \
     auto offset = frame->getBytecodePC<const uint32_t>();                           \
     SET_PC(frame, GET_PC(frame));                                                   \
     if(conditional) {                                                               \
