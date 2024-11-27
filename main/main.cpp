@@ -13,6 +13,15 @@ void napiPrint(Frame::Frame *frame)
     std::cout << "---------------" << std::endl;
 }
 
+void napiPrintAA(Frame::Frame *frame)
+{
+    std::cout << "AAAA" << std::endl;
+}
+void napiPrintBB(Frame::Frame *frame)
+{
+    std::cout << "BBB" << std::endl;
+}
+
 void FibsCycle(uint64_t n) {
     auto exec = new Executor::Executor();
     auto emitter = new Emitter::Emitter();
@@ -38,46 +47,42 @@ void FibsCycle(uint64_t n) {
 void FibsRecursion(uint64_t n)
 {
     Emitter::Emitter emit;
+    auto exec = new Executor::Executor();
 
-    // std::shared_ptr<Method::Method> Fibs(new Method::Method(1, 5));
+    emit.startEmitMethod("Fibs");
+    emit.CreateMV(5, 2);
+    emit.CreateCMPGT(0, 5);
+    emit.CreateCJMPT("recursion");
+    emit.CreateMV(5, 1);
+    emit.CreateSTACC(5);
+    emit.CreateRET();
 
-    // emit.createMv(*Fibs, 5, 2);
-    // emit.createCmpgt(*Fibs, 0, 5);
-    // emit.createCjmpt(*Fibs, "recursion");
-    // emit.createMv(*Fibs, 5, 1);
-    // emit.createStacc(*Fibs, 5);
-    // emit.createRet(*Fibs);
+    emit.CreateMark("recursion");
+    emit.CreateMV(5, 1);
+    emit.CreateSUB(0, 0, 5);
+    emit.CreateCALL("Fibs");
+    emit.CreateLDACC(1);
+    emit.CreateSUB(0, 0, 5);
+    emit.CreateCALL("Fibs");
+    emit.CreateLDACC(2);
+    emit.CreateADD(3, 2, 1);
+    emit.CreateSTACC(3);
+    emit.CreateRET();
+    emit.endEmitMethod(*exec, 1, 7);
 
-    // emit.createMark(*Fibs, "recursion");
-    // emit.createMv(*Fibs, 5, 1);
-    // emit.createSub(*Fibs, 0, 0, 5);
-    // emit.createCall(*Fibs, "Fibs");
-    // emit.createLdacc(*Fibs, 1);
-    // emit.createSub(*Fibs, 0, 0, 5);
-    // emit.createCall(*Fibs, "Fibs");
-    // emit.createLdacc(*Fibs, 2);
-    // emit.createAdd(*Fibs, 3, 2, 1);
-    // emit.createStacc(*Fibs, 3);
-    // emit.createRet(*Fibs);
+    emit.startEmitMethod("main");
+    emit.CreateMV(0, n);
+    emit.CreateCALL("Fibs");
+    emit.CreateLDACC(2);
+    emit.CreateCALLNAPI(reinterpret_cast<uint8_t *>(&napiPrint));
+    emit.CreateRET();
+    emit.endEmitMethod(*exec, 0, 5);
 
-    // std::shared_ptr<Method::Method> pMain(new Method::Method(0, 5));
-
-    // emit.createMv(0, n);
-    // emit.createCall("Fibs");
-    // emit.createLdacc(2);
-    // emit.createPrint("fib: ", 2);
-    // emit.createRet(*pMain);
-
-    // std::unordered_map<std::string, std::shared_ptr<Method::Method>> methods {};
-    // methods["main"] = pMain;
-    // methods["Fibs"] = Fibs;
-    // Executor exec(methods);
-    // exec.simpleInterpreter("main");
-
+    exec->Run(1);
 };
 
 int main()
 {
-    FibsCycle(14);
+    FibsRecursion(14);
     return 0;
 }

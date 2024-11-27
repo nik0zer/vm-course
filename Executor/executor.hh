@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-constexpr uint64_t STACK_MEM_SIZE = 1024 * 1024 * 15;
+constexpr uint64_t STACK_MEM_SIZE = (uint64_t)(1024) * 1024 * 1024 * 3;
 
 // #define COMPUTED_GOTO
 
@@ -39,11 +39,11 @@ class Executor {
       delete[] stackMem_;
     }
 
-    inline Method::Method *getMethod(Method::ImmType mark) {
+    inline Method::Method *getMethod(Method::CallMarkType mark) {
       return methodList_[mark];
     }
 
-    inline void Run(Method::ImmType callIndex)
+    inline void Run(Method::CallMarkType callIndex)
     {
       simpleInterpreterExecute(getMethod(callIndex), nullptr);
       std::cout << "Interpreter end work, num of operations: " << numOfOperations << std::endl;

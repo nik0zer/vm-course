@@ -13,6 +13,7 @@ static void PutDataToBuffer(uint8_t **ptr, ValType val) {
 
 void Emitter::startEmitMethod(const std::string &name) {
     marks = std::map<std::string, uint32_t>();
+    EmittedInstrs = std::vector<emitterInstr>();
     if(std::find(methods.begin(), methods.end(), name) == methods.end())
     {
         methods.push_back(name);
@@ -71,12 +72,12 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     currPosition += instr.instrSize; \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
     {\
-    auto methodIter = std::find(methods.begin(), methods.end(), instr.mark); \
-    if(methodIter == methods.end()) { \
-        methodIter = methods.insert(methodIter, instr.mark); \
-    } \
+        auto methodIter = std::find(methods.begin(), methods.end(), instr.mark); \
+        if(methodIter == methods.end()) { \
+            methodIter = methods.insert(methodIter, instr.mark); \
+        } \
+        PutDataToBuffer<Method::CallMarkType>(&currDataPtr, static_cast<Method::CallMarkType>(std::distance(methods.begin(), methodIter)));\
     }\
-    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(std::distance(methods.begin(), methodIter)));
 
     #define PUT_TO_BUF_CALL_NAPI() \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \

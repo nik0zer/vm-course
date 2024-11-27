@@ -7,6 +7,7 @@ namespace Method
 
 using RegValue = int64_t;
 using RegType = uint16_t;
+using CallMarkType = uint16_t;
 using ImmType = RegValue;
 using OffsetType = int32_t;
 using AddressType = uint8_t *;

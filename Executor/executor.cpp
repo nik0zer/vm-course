@@ -89,14 +89,15 @@ JUMP(acc != 0, CJMPT, acc)
 JUMP(acc == 0, CJMPF, acc)
 
 static inline void handleCALL(Executor *executor, Frame::Frame *frame, Method::RegValue &acc) {
-    auto callMark = frame->getBytecodePC<const Method::ImmType>();
+    auto callMark = frame->getBytecodePC<const Method::CallMarkType>();
     frame->setAcc(acc);
     executor->simpleInterpreterExecute(executor->getMethod(callMark), frame);
+    acc = frame->getAcc();  
 }
 
 #define handleRET(this, frame, acc)                                                                     \
     frame->setAcc(acc);                                                                                 \
-    if(prevFrame != frame->getPrevFrame()) { frame->getPrevFrame()->setAcc(acc); }                      \
+    if(frame->getPrevFrame() != nullptr) { frame->getPrevFrame()->setAcc(acc); }                        \
     return;
 
 static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Method::RegValue &acc) {
@@ -110,6 +111,7 @@ static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Metho
 void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
 {
     auto frame = new (stackPtr_) Frame::Frame(method, prevFrame, &stackPtr_);
+    if(prevFrame != nullptr) { frame->copyParams(*prevFrame); }
     auto acc = frame->getAcc();
 #ifndef COMPUTED_GOTO
     GENERATE_DISPATCH_SWITCH()
