@@ -14,13 +14,18 @@ class Frame
 {
   private:
     Method::Method *method;
-    Method::RegValue regFile_[MAX_REG_FILE_SIZE] {};
     Method::RegValue PC {0};
     Frame *prevFrame_;
     Method::RegValue accumulator_;
+    Method::RegValue regFile_[];
+
 
   public:
-    Frame(Method::Method *method, Frame* prevFrame) : method(method), prevFrame_(prevFrame) {}
+    Frame(Method::Method *method, Frame* prevFrame, uint8_t** stackPtr) : method(method), prevFrame_(prevFrame) 
+    {
+        new (&regFile_) Method::RegValue[method->allRegisters()];
+        (*stackPtr) = reinterpret_cast<uint8_t *>(&(regFile_[method->allRegisters() + 1]));
+    }
 
     Frame() {}
 

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#define MAX_STACK_DEPTH 1024
+constexpr uint64_t STACK_MEM_SIZE = 1024 * 1024 * 15;
 
 // #define COMPUTED_GOTO
 
@@ -19,16 +19,25 @@ namespace Executor
 
 class Executor {
   private:
-    Frame::Frame callStack_[MAX_STACK_DEPTH] {};
     std::vector<Method::Method *> methodList_ {};
 
     void handleCall(int callMethod);
-    Frame::Frame *stackPtr_ { &callStack_[MAX_STACK_DEPTH - 1] };
+    uint8_t *stackPtr_;
+    uint8_t *stackMem_;
 
   public:
-    Executor() {};
+    Executor() {
+      stackMem_ = new uint8_t[STACK_MEM_SIZE]; 
+      stackPtr_ = stackMem_;
+    };
+
+    ~Executor() {
+      delete[] stackMem_;
+    }
 
     void simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame);
+
+    void nativeExecute(void *nativeMethod, Frame::Frame *prevFrame);
 
     friend class Emitter::Emitter;
 };

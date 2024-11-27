@@ -74,11 +74,17 @@ static inline void name (Frame::Frame *frame, Method::RegValue &##acc) {        
 void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
 {
     uint64_t numOfOperations = 0;
-    auto frame = stackPtr_;
+    auto frame = new (stackPtr_) Frame::Frame(method, prevFrame, &stackPtr_);
     auto acc = frame->getAcc();
 #ifndef COMPUTED_GOTO
     GENERATE_DISPATCH_SWITCH()
 #endif
+}
+
+void Executor::nativeExecute(void *nativeMethod, Frame::Frame *prevFrame)
+{
+    auto nativeCall = reinterpret_cast<void (*)(Frame::Frame *)>(nativeMethod);
+    nativeCall(prevFrame);
 }
 
 }
