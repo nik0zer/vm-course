@@ -63,7 +63,7 @@ class Frame
     {
         auto pc = PC;
         PC += sizeof(ValType);
-        return method->getBytecode<ValType>(PC);
+        return method->getBytecode<ValType>(pc);
     }
 
     inline void copyParams(const Frame &otherFrame)
@@ -74,6 +74,11 @@ class Frame
     inline Frame *getPrevFrame()
     {
         return prevFrame_;
+    }
+
+    inline const Method::RegType &getAllRegs()
+    {
+        return method->allRegisters();
     }
 
 

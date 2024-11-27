@@ -79,7 +79,7 @@ COMPARE(>=, CMPGE, acc)
 static inline void handle##name (Executor *executor, Frame::Frame *frame, Method::RegValue& acc) {      \
     auto offset = frame->getBytecodePC<const Method::OffsetType>();                                     \
     if(conditional) {                                                                                   \
-        SET_PC(frame, GET_PC(frame));                                                                   \
+        SET_PC(frame, GET_PC(frame) + offset);                                                          \
     }                                                                                                   \
 }
 

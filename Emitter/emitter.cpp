@@ -65,7 +65,7 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     #define PUT_TO_BUF_MARK()                                           \
     currPosition += instr.instrSize;                                    \
     PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode);    \
-    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(currPosition - marks[instr.mark]));
+    PutDataToBuffer<Method::OffsetType>(&currDataPtr, static_cast<Method::OffsetType>(marks[instr.mark] - currPosition));
 
     #define PUT_TO_BUF_CALL_MARK()\
     currPosition += instr.instrSize; \
@@ -102,7 +102,7 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     Method::Method *method = new Method::Method(params, localVars, methodSize, buffer);
     if(executor.methodList_.size() <= index)
     {
-        executor.methodList_.resize(index * 2);
+        executor.methodList_.resize((index + 1) * 2);
     }
     executor.methodList_[index] = method;
 
