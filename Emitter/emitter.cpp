@@ -37,6 +37,38 @@ void Emitter::endEmitMethod(Executor::Executor &executor, Method::RegType params
     // и кола (заменить марк функции на индекс функции найденный в векторе methods,
     // если его там нет то добавить его туда)
 
+    #define PUT_TO_BUF_IMM_1_REG_1() \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    PutDataToBuffer<Method::ImmType>(&currDataPtr, instr.imm); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rd);
+
+    #define PUT_TO_BUF_REG_1() \
+    PutDataToBuffer<Method::OpcodeType>(&currDataPtr, instr.opcode); \
+    PutDataToBuffer<Method::RegType>(&currDataPtr, instr.rs1);
+
+    #define PUT_TO_BUF_REG_3() \
+
+
+    #define PUT_TO_BUF_REGIN_2() \
+
+
+    #define PUT_TO_BUF_IMM_1() \
+
+    #define PUT_TO_BUF_OPCODE() \
+
+
+    #define CASE_INSTR(opcode, mnemonic, format)                                              \
+    case opcode:                                                                    \
+        PUT_TO_BUF_##format();                                                   \
+        break;
+
+    for (auto instr: EmittedInstrs) {
+        switch (instr.opcode) {                                                           
+            ALL_INSTR_LIST(CASE_INSTR)                                              
+        }  
+    }
+     
+
     Method::Method *method = new Method::Method(params, localVars, methodSize, buffer);
     if(executor.methodList_.size() <= index)
     {
@@ -61,6 +93,7 @@ void Emitter::CreateMark(const std::string &markName)
 void Emitter::Create##mnemonic(Method::RegType rd, Method::ImmType imm) { \
     emitterInstr instr{};                                                 \
     instr.opcode = num_opcode;                                            \
+    instr.rd = rd;                                                        \
     instr.imm = imm;                                                      \
     instr.instrSize = SIZE_##format;                                      \
     EmittedInstrs.push_back(instr);                                       \
@@ -76,11 +109,10 @@ void Emitter::Create##mnemonic(Method::RegType rs1) {  \
 }
 
 #define GEN_CREATE_REG_3(num_opcode, mnemonic, format)                                                              \
-void Emitter::Create##mnemonic(Method::RegType rd, Method::ImmType imm, Method::RegType rs1, Method::RegType rs2) { \
+void Emitter::Create##mnemonic(Method::RegType rd, Method::RegType rs1, Method::RegType rs2) { \
     emitterInstr instr{};                                                                                           \
     instr.opcode = num_opcode;                                                                                      \
     instr.rd = rd;                                                                                                  \
-    instr.imm = imm;                                                                                                \
     instr.rs1 = rs1;                                                                                                \
     instr.rs2 = rs2;                                                                                                \
     instr.instrSize = SIZE_##format;                                                                                \

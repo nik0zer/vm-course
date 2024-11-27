@@ -17,7 +17,6 @@ namespace Emitter
 struct emitterInstr
 {
   Method::OpcodeType opcode;
-  Method::OffsetType offset;
   Method::ImmType imm;
   Method::RegType rs1, rs2, rd;
   std::string mark;
@@ -43,18 +42,18 @@ class Emitter {
 
     #define DECLARE_IMM_1_REG_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rd, Method::ImmType imm);
     #define DECLARE_REG_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rs1);
-    #define DECLARE_REG_3(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rd, Method::ImmType imm, Method::RegType rs1, Method::RegType rs2);
+    #define DECLARE_REG_3(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rd, Method::RegType rs1, Method::RegType rs2);
     #define DECLARE_REGIN_2(num_opcode, mnemonic, format) void Create##mnemonic(Method::RegType rs1, Method::RegType rs2);
     #define DECLARE_IMM_1(num_opcode, mnemonic, format) void Create##mnemonic(Method::ImmType imm);
     #define DECLARE_OPCODE(num_opcode, mnemonic, format) void Create##mnemonic();
 
-    ALL_INSTR_LIST(DECLARE_IMM_1_REG_1)
-    ALL_INSTR_LIST(DECLARE_REG_1)
-    ALL_INSTR_LIST(DECLARE_REG_3)
-    ALL_INSTR_LIST(DECLARE_REGIN_2)
-    ALL_INSTR_LIST(DECLARE_IMM_1)
-    ALL_INSTR_LIST(DECLARE_OPCODE)
+    #define DECLARE_CREATES(num_opcode, mnemonic, format)                   \
+      DECLARE_##format(num_opcode, mnemonic, format)
 
+
+    ALL_INSTR_LIST(DECLARE_CREATES)
+
+    #undef DECLARE_CREATES
     #undef DECLARE_IMM_1_REG_1
     #undef DECLARE_REG_1
     #undef DECLARE_REG_3
