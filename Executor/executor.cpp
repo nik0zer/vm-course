@@ -136,6 +136,10 @@ static inline void handleCALLNAPI(Executor *executor, Frame::Frame *frame, Metho
 void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *prevFrame)
 {
     auto frame = new (stackPtr_) Frame::Frame(method, prevFrame, &stackPtr_);
+    if(stackPtr_ > stackMem_ + STACK_MEM_STOP_SIZE)
+    {
+        [[unlikely]] abort();
+    }
     if(prevFrame != nullptr) { frame->copyParams(*prevFrame); }
     auto acc = frame->getAcc();
     GENERATE_DISPATCH_SWITCH()

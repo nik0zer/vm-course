@@ -7,7 +7,8 @@
 #include <vector>
 #include <iostream>
 
-constexpr uint64_t STACK_MEM_SIZE = (uint64_t)(1024) * 1024 * 50;
+constexpr uint64_t STACK_MEM_SIZE = (uint64_t)(1024) * 1024 * 55;
+constexpr uint64_t STACK_MEM_STOP_SIZE = (uint64_t)(1024) * 1024 * 50;
 
 #define COMPUTED_GOTO
 
