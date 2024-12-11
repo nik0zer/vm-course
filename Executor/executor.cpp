@@ -8,6 +8,8 @@
 namespace Executor
 {
 
+#ifndef COMPUTED_GOTO
+
 #define CASE_INSTR(opcode, name, size)                                              \
     case opcode:                                                                    \
         handle##name(this, frame, acc);                                             \
@@ -22,6 +24,29 @@ namespace Executor
             ALL_INSTR_LIST(CASE_INSTR)                                              \
         }                                                                           \
     }
+
+#endif
+
+#ifdef COMPUTED_GOTO
+
+#define CASE_INSTR(opcode, name, size)                                              \
+    name:                                                                           \
+    numOfOperations++;                                                              \
+    handle##name(this, frame, acc);                                                 \
+    instrOpcode = frame->getBytecodePC<Method::OpcodeType>();                       \
+    goto *instrMarks[instrOpcode];                                                  \
+
+#define CREATE_GOTO_LABELS(opcode, name, size)                                      \
+    &&name,                                                                         \
+
+
+#define GENERATE_DISPATCH_SWITCH()                                                  \
+    static void *instrMarks[] = {ALL_INSTR_LIST(CREATE_GOTO_LABELS)};               \
+    auto instrOpcode = frame->getBytecodePC<Method::OpcodeType>();                  \
+    goto *instrMarks[instrOpcode];                                                  \
+    ALL_INSTR_LIST(CASE_INSTR)                                                      \
+
+#endif
 
 
 #define SET_REG(method, reg, val)                                                   \
@@ -113,9 +138,7 @@ void Executor::simpleInterpreterExecute(Method::Method *method, Frame::Frame *pr
     auto frame = new (stackPtr_) Frame::Frame(method, prevFrame, &stackPtr_);
     if(prevFrame != nullptr) { frame->copyParams(*prevFrame); }
     auto acc = frame->getAcc();
-#ifndef COMPUTED_GOTO
     GENERATE_DISPATCH_SWITCH()
-#endif
 }
 
 void Executor::nativeExecute(void *nativeMethod, Frame::Frame *prevFrame)

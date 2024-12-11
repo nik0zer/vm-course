@@ -9,7 +9,7 @@
 
 constexpr uint64_t STACK_MEM_SIZE = (uint64_t)(1024) * 1024 * 50;
 
-// #define COMPUTED_GOTO
+#define COMPUTED_GOTO
 
 namespace Emitter
 {
